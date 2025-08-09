@@ -27,7 +27,6 @@
     googleSiteVerification: 'KW-vaMpUJqCPV9bqy54jn_cMkWti7eiInTwIwYhtJ88',
     // facebookDomainVerification: 'ivmn6elre6bpa0nayqb7qmy91h5pta',
   });
-
   /*
   <NuxtImg src="/img/logo.png" alt="Image of the logo of Epices du Monde" width="400" height="400"
     v-slot="{ src, isLoaded, imgAttrs }">
@@ -45,6 +44,7 @@
       <TheHeader />
 
       <main id="#main">
+        <NuxtRouteAnnouncer />
         <NuxtPage />
       </main>
       <TheFooter>

@@ -14,7 +14,7 @@
         },
         {
             label: 'Epices & Sauces',
-            link: '/categories/epices_et_sauces',
+            link: '/categories/epices-et-sauces',
             img: { icon: 'fa6-solid:pepper-hot', color: 'red' },
         },
         {
@@ -24,47 +24,47 @@
         },
         {
             label: 'Boissons alcoolisées',
-            link: '/categories/boissons_alcoolisees',
+            link: '/categories/boissons-alcoolisees',
             img: { icon: 'fa6-solid:beer-mug-empty', color: 'blue' },
         },
         {
             label: 'Boissons sans alcool & Soda',
-            link: '/categories/boissons_soda',
+            link: '/categories/boissons-soda',
             img: { icon: 'fa6-solid:glass-water', color: 'blue' },
         },
         {
             label: 'Thé, Tisanes & Bois. chaudes',
-            link: '/products?filter=the_tisanes_bois_chaudes',
+            link: '/categories/boissons-chaudes',
             img: { icon: 'fa6-solid:mug-hot', color: 'green' },
         },
         {
             label: 'Aperitifs & Collations',
-            link: '/categories/aperetifs_collations',
+            link: '/categories/aperitifs-collations',
             img: { icon: 'fa6-solid:stroopwafel', color: 'blue' },
         },
         {
             label: 'Sucre, miels',
-            link: '/categories/sucre_miels',
+            link: '/products?categories=sucre-miels',
             img: { icon: 'fa6-solid:cubes-stacked', color: 'blue' },
         },
         {
             label: 'Nouilles, pâtes & autres féculents',
-            link: '/categories/feculents_sauces_prep',
+            link: '/categories/feculents-sauces-prep',
             img: { icon: 'fa6-solid:bowl-food', color: 'blue' },
         },
         {
             label: 'Fruits & Légumes',
-            link: '/categories/fruits_et_legumes',
+            link: '/categories/fruits-et-legumes',
             img: { icon: 'fa6-solid:apple-whole', color: 'green' },
         },
         {
             label: 'Produits de la mer',
-            link: '/categories/produits_mer',
+            link: '/categories/produits-mer',
             img: { icon: 'fa6-solid:fish', color: 'blue' },
         },
         {
             label: 'Insectes comestibles',
-            link: '/categories/insectes_comestibles',
+            link: '/products?categories=insectes-comestibles',
             img: { icon: 'fa6-solid:bug', color: 'blue' },
         },
         {
@@ -74,12 +74,12 @@
         },
         {
             label: 'Ustensiles de cuisine',
-            link: '/categories/ustensiles_cuisine',
+            link: '/products?categories=ustensiles-cuisine',
             img: { icon: 'fa6-solid:utensils', color: 'blue' },
         },
         {
             label: 'Encens, Baguettes & Décorations',
-            link: '/categories/encens_baguettes_decorations',
+            link: '/categories/encens-baguettes-decorations',
             img: { icon: 'fa6-solid:grip-lines', color: 'blue' },
         },
     ]);
@@ -87,19 +87,20 @@
 
 <template>
     <section class="flex items-center mb-6">
-        <UCarousel v-slot="{ item }" loop arrows :items="categories" :ui="{
+        <UCarousel v-slot="{ item }" loop arrows dots :items="categories" :ui="{
+            root: 'mb-6',
             viewport: 'overflow-hidden',
             container: 'transition-[height]',
-            controls: 'carousel-ctg--controls',
-            dots: '-top-7',
+            controls: '',
+            dots: '',
             dot: 'w-6 h-1',
-            item: 'm-4',
+            item: 'xl:basis-1/3',
         }" :prev-icon="'fa6-solid:chevron-left'" :next-icon="'fa6-solid:chevron-right'"
-            class="w-full max-w-xs mx-auto z-1">
+            class="w-full max-w-xs xl:max-w-6xl mx-auto z-1">
             <a :href="item.link"
                 class="flex flex-col items-center w-[18rem] h-[10rem] p-4 text-(--silver) cursor-pointer rounded-xl"
                 :style="`background-color: ${item.img.color}`">
-                <UIcon :name="item.img.icon" class="w-18 h-18" />
+                <UIcon :name="item.img.icon" width="234" height="234" class="w-18 h-18" />
                 <span class="w-full h-auto text-base text-center font-semibold p-4">{{ item.label }}</span>
             </a>
         </UCarousel>

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+    import { USelect } from '#components';
+
     const props = defineProps<{
         selectValue: string,
     }>(),

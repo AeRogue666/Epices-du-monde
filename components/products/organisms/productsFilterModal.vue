@@ -1,5 +1,6 @@
 <script setup lang="ts">
-    import ProductsFilterCtg from './productsFilterCtg.vue';
+    import { UDrawer } from '#components';
+    import ProductsFilterCtg from '../organisms/productsFilterCtg.vue';
 
     defineProps<{
         tagsList: Array<{

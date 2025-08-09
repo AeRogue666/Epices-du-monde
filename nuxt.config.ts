@@ -2,15 +2,32 @@
 export default defineNuxtConfig({
   compatibilityDate: "2025-05-15",
   devtools: { enabled: false },
-  modules: ["@nuxt/ui", "@nuxt/image", "@nuxt/fonts", "@nuxt/icon", "@nuxtjs/tailwindcss", "@pinia/nuxt", "@vueuse/motion/nuxt"],
-  css: ['~/assets/css/main.css'],
+  modules: [
+    "@nuxt/ui",
+    "@nuxt/image",
+    "@nuxt/fonts",
+    "@nuxt/icon",
+    "@nuxtjs/tailwindcss",
+    "@pinia/nuxt",
+    "@vueuse/motion/nuxt",
+    "@nuxtjs/mdc",
+  ],
+  css: ["~/assets/css/main.css"],
+  mdc: {
+    components: {
+      prose: true,
+    },
+  },
   runtimeConfig: {
     public: {
-      apiBase: "https://dummyjson.com",
+      apiBase: "localhost:8055",
       motion: {
-        directives: {}
+        directives: {},
       },
     },
+  },
+  routeRules: {
+    "/directus/**": { proxy: `${import.meta.env.API_URL}/**` },
   },
   app: {
     head: {
@@ -19,8 +36,8 @@ export default defineNuxtConfig({
         lang: "fr",
       },
       link: [{ rel: "icon", type: "image/x-icon", href: "./favicon.ico" }],
-      charset: 'utf-16',
-      viewport: 'width=device-width, initial-scale=1, maximum-scale=1',
+      charset: "utf-16",
+      viewport: "width=device-width, initial-scale=1, maximum-scale=1",
     },
   },
 });

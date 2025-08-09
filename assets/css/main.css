@@ -123,3 +123,23 @@ li {
     left: 100%;
   }
 }
+
+.red {
+  background-color: var(--primary-color);
+}
+
+.orange {
+  background-color: var(--primary-color-2);
+}
+
+.yellow {
+  background-color: var(--secondary-color-1);
+}
+
+.orange {
+  background-color: var(--secondary-color-2);
+}
+
+.green {
+  background-color: var(--secondary-color-3);
+}

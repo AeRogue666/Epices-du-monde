@@ -1,38 +1,54 @@
 <script setup lang="ts">
+import { capitalize } from 'vue';
+
     defineProps<{
-        origine: string,
-        marque: string,
-        poids_net: string,
-        price: number,
-        price_per_kg: number,
-        reduction_rate: number,
-        old_price: number,
-        stock: {
-            availability: string,
-            number: number,
-            color: string,
-        },
+        product: {
+            id: number,
+            title: string,
+            description: string,
+            ingredients: string,
+            slug: string,
+            origine: string,
+            marque: string,
+            poids_net?: number,
+            price: number,
+            price_per_kg: number,
+            reduction_rate?: number,
+            old_price?: number,
+            availability: object,
+            stock: number,
+            image: object,
+            tags?: [],
+            allergies?: [],
+            nutrition?: [],
+            labels?: [],
+        }
     }>();
     const productNumber = ref<number>(1);
 </script>
 
 <template>
-    <UContainer class="w-96 h-96 border border-solid border-(--color-text)">
-        <div class="flex flex-col gap-4">
-            <span class="text-base font-semibold">{{ price }} €</span>
-            <span class="text-base">Poids net: {{ poids_net }}</span>
-            <span>1 kg = {{ price_per_kg }} €</span>
+    <UContainer class="flex flex-col w-96 h-full border border-solid border-(--color-text)">
+        <div class="flex flex-col items-start my-6 gap-4">
+            <span class="text-base font-semibold">{{ product.price }} €</span>
+            <span class="text-base">Poids net: {{ product.poids_net }}</span>
+            <span class="text-base">1 kg = {{ product.price_per_kg }} €</span>
         </div>
-        <div class="flex flex-col">
+        <div class="flex flex-col items-start my-6 gap-4">
             <span class="flex flex-row items-center text-base gap-2">
-                <UIcon name="i-fa6-solid:circle" class="size-5" :class="stock.color" />
-                {{ stock.availability }}: {{ stock.number }}
+                <UIcon name="i-fa6-solid:circle" class="size-5" :class="product.availability.color" />
+                {{ capitalize('en stock') }}: {{ product.stock }}
             </span>
-            <UContainer>
-                <UInputNumber v-model="productNumber" :default-value="1" :min="1" :max="99" />
+            <UContainer class="flex flex-col items-center">
+                <UFormField label="Nombre de produits" help="" class="mt-6 mb-9" required>
+                    <UInputNumber v-model="productNumber" :default-value="1" :min="1" :max="product.stock" size="xl"
+                        placeholder="Spécifier le nombre de produits"
+                        :increment="{ color: 'neutral', variant: 'solid', size: 'xl' }"
+                        :decrement="{ color: 'neutral', variant: 'solid', size: 'xl' }" />
+                </UFormField>
                 <UButton color="neutral" variant="outline" size="xl" icon="fa6-solid:cart-shopping"
                     class="flex items-center w-auto h-auto min-w-[12rem] text-xl p-4 border-2 border-solid border-(--color-text) rounded-lg relative">
-                    Ajouter au panier</UButton>
+                {{ capitalize('ajouter au panier') }}</UButton>
             </UContainer>
         </div>
     </UContainer>

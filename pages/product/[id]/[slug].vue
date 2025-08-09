@@ -1,9 +1,39 @@
 <script setup lang="ts">
     import { UContainer } from '#components';
 
-    const route = useRoute();
-    
-    const product = reactive<{
+    const { id } = useRoute().params,
+        { $directus, $readItem, $readFile } = useNuxtApp();
+
+    const { data: product } = await useAsyncData('Product', () => {
+        return $directus.request($readItem('Product', id.toString()))
+    }),
+        { data: img } = await useAsyncData('Image', () =>
+            $fetch(`http://localhost:3000/directus/files?filter[id][_eq]=${product.value?.image_id}&fields=id,description,width,height`)
+        );
+
+    const availabilityTypeList = reactive<{
+        name: string,
+        value: string,
+        color: string,
+    }[]>([
+        {
+            name: 'Available soon',
+            value: 'soon',
+            color: 'black',
+        },
+        {
+            name: 'In stock',
+            value: 'in_stock',
+            color: 'green',
+        },
+        {
+            name: 'Out of stock',
+            value: 'out_of_stock',
+            color: 'red',
+        },
+    ]);
+
+    const productList = reactive<{
         id: number,
         title: string,
         description: string,
@@ -11,71 +41,59 @@
         slug: string,
         origine: string,
         marque: string,
-        poids_net: string,
+        poids_net?: number,
         price: number,
         price_per_kg: number,
-        reduction_rate: number,
-        old_price: number,
-        stock: {
-            availability: string, //(in_stock, no_stock, soon)
-            number: number,
-            color: string,
-        },
-        image: Array<{
-            id: number,
-            image: string,
-            description: string,
-            type: string,
-            format: string,
-            width: number,
-            height: number,
-        }>,
+        reduction_rate?: number,
+        old_price?: number,
+        stock: number,
+        availability: object,
+        image: object,
         tags?: [],
         allergies?: [],
-        nutritionnals_values?: [],
+        nutrition?: [],
         labels?: [],
-    }[]>([
-        {
-            id: 1,
-            title: 'Product Title',
-            description: '',
-            slug: 'product-title',
-            origine: '',
-            marque: '',
-            poids_net: '1 kg',
-            ingredients: '',
-            price: 1.11,
-            price_per_kg: 1.11,
-            reduction_rate: 0,
-            old_price: 1.11,
-            stock: {
-                availability: 'In stock',
-                number: 2,
-                color: 'green',
-            },
-            image: [{
-                id: 1,
-                image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Real_Monasterio_de_San_Juan_de_la_Pe%C3%B1a%2C_Huesca%2C_Espa%C3%B1a%2C_2023-01-05%2C_DD_48-50_HDR.jpg/330px-Real_Monasterio_de_San_Juan_de_la_Pe%C3%B1a%2C_Huesca%2C_Espa%C3%B1a%2C_2023-01-05%2C_DD_48-50_HDR.jpg',
-                description: 'Une image du Monastère de San Juan de la Pena Huesca en Espagne',
-                type: 'image',
-                format: 'image/jpeg',
-                width: 330,
-                height: 174,
-            }],
-        }
-    ]);
+    }[]>([]);
+
+
+    const productAssemble = () => {
+        const type = availabilityTypeList.filter((type) => type.value === product.value?.availability)[0];
+        if(product.value && img.value)
+        productList.push({
+            id: product.value.id,
+            title: product.value.title,
+            description: product.value.description,
+            ingredients: product.value.ingredients,
+            slug: product.value.slug,
+            origine: product.value.origine,
+            marque: product.value.marque,
+            poids_net: product.value.poids_net,
+            price: product.value.price,
+            price_per_kg: product.value.price_per_kg,
+            reduction_rate: product.value.reduction_rate,
+            old_price: product.value.old_price,
+            stock: product.value.stock,
+            availability: type,
+            image: img.value.data,
+        })
+    };
+
+    onMounted(() => {
+        product ? img : ''
+        product && img ? productAssemble() : ''
+    })
 </script>
 
 <template>
-    <UContainer v-for="(product, i) of product" class="flex flex-col items-center w-full h-full gap-2"
+    <UContainer v-for="(product, i) of productList" class="flex flex-col items-center w-full h-full gap-2"
         :key="i + product.id">
         <h1 class="text-5xl font-semibold">{{ product.title }}</h1>
         <section class="flex flex-col items-center w-full h-auto gap-6">
-            <nuxt-picture v-for="(img, i) of product.image" :legacy-format="img.format" :src="img.image"
-                :alt="img.description" :width="img.width" :height="img.height" :key="i + img.id" />
-            <product-components-product-infos-modal :origine="product.origine" :marque="product.marque"
-                :poids_net="product.poids_net" :price="product.price" :price_per_kg="product.price_per_kg"
-                :reduction_rate="product.reduction_rate" :old_price="product.old_price" :stock="product.stock" />
+            <nuxt-picture v-for="(img, i) of product.image" legacy-format="image"
+                :src="`http://localhost:3000/directus/assets/${img.id}`"
+                :img-attrs="{ id: img.id, class: 'rounded-xl' }" :alt="img.description" :key="i + img.id" />
+            <product-components-product-infos-modal :product="product" />
+            <ProductComponentsProductDescriptionModal :source="product.description" />
         </section>
     </UContainer>
 </template>
