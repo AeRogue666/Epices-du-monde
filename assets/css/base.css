@@ -20,7 +20,7 @@
 }
 
 [data-theme="light"] {
-  --color-bg: var(--silver);
+  --color-bg: var(--color-white);
   --color-header: var(--primary-color);
   --color-text: var(--black);
   --color-logo: var(--primary-color);

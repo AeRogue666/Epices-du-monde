@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { capitalize } from 'vue';
+    import { capitalize } from 'vue';
 
     defineProps<{
         product: {
@@ -24,7 +24,12 @@ import { capitalize } from 'vue';
             labels?: [],
         }
     }>();
-    const productNumber = ref<number>(1);
+
+    const productNumber = defineModel({ default: 1 });
+
+    defineEmits<{
+        change: [id: number]
+    }>();
 </script>
 
 <template>
@@ -46,9 +51,9 @@ import { capitalize } from 'vue';
                         :increment="{ color: 'neutral', variant: 'solid', size: 'xl' }"
                         :decrement="{ color: 'neutral', variant: 'solid', size: 'xl' }" />
                 </UFormField>
-                <UButton color="neutral" variant="outline" size="xl" icon="fa6-solid:cart-shopping"
+                <UButton color="neutral" variant="outline" size="xl" icon="fa6-solid:cart-shopping" @click.prevent="$emit('change', productNumber)"
                     class="flex items-center w-auto h-auto min-w-[12rem] text-xl p-4 border-2 border-solid border-(--color-text) rounded-lg relative">
-                {{ capitalize('ajouter au panier') }}</UButton>
+                    {{ capitalize('ajouter au panier') }}</UButton>
             </UContainer>
         </div>
     </UContainer>

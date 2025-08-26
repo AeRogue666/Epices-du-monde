@@ -4,7 +4,10 @@
     import ProductsFilterModal from '~/components/products/organisms/productsFilterModal.vue';
     import ProductsTagsList from '~/components/products/molecules/productsMoleculesTagsList.vue';
 
-    const { query } = useRoute(), { $directus, $readItems } = useNuxtApp();
+    const { query } = useRoute(),
+        { currentRoute } = useRouter(),
+        { $directus, $readItems } = useNuxtApp();
+
     const image = reactive<{
         id: string,
         description: string,

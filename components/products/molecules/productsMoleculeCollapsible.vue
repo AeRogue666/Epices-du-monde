@@ -1,8 +1,6 @@
 <script setup lang="ts">
-    import type { Reactive } from 'vue';
-
     defineProps<{
-        filteredCategories: Reactive<{}[]>,
+        filteredCategories: Array<string>,
         categoriesList: Array<{
             id: number,
             label: string,
@@ -29,10 +27,10 @@
     <ul class="grid grid-cols-1 w-full gap-3">
         <li class="mx-4">
             <span>Filtrer par catégories: </span>
-            <span v-if="filteredCategories.length !== 0" class="text-green-600">{{ filteredCategories.length
+            <span v-if="filteredCategories" class="text-green-600">{{ filteredCategories.length
             }}</span>
             <UCollapsible>
-                <UButton v-bind:as="filteredCategories" type="button" label="Categories" color="neutral" size="xl"
+                <UButton type="button" label="Categories" color="neutral" size="xl"
                     variant="outline" trailing-icon="i-fa6-solid:chevron-down"
                     class="justify-center w-full py-4 text-xl" @click="openFilterCtgMenu" />
                 <template #content>

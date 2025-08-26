@@ -64,9 +64,9 @@ main {
   border-bottom: 1px solid var(--color-border);
 }
 
-#mobile-menu nav div ul li:hover {
+/* #mobile-menu nav div ul li:hover {
   color: var(--secondary-color-2);
-}
+} */
 
 #mobile-menu nav div ul li:last-child {
   border-bottom: none;

@@ -1,15 +1,20 @@
 <script setup lang="ts">
     import type { NavigationMenuItem } from '@nuxt/ui';
-    import HeaderMenu from './molecules/HeaderMenu.vue';
+    import HeaderLeftMenu from './organisms/HeaderLeftMenu.vue';
+    import HeaderRightMenu from './organisms/HeaderRightMenu.vue';
 
-    const { search } = useSearchQueryStore(),
-        isMenuOpen = ref<boolean>(false),
-        updateIsMenuOpen = (value: boolean) => {
-            isMenuOpen.value = value
-        }
-
+    const isLeftMenuOpen = ref<boolean>(false);
     const items = ref<NavigationMenuItem[]>([
         [
+            {
+                label: 'Recettes',
+                type: 'label',
+            },
+            {
+                label: 'Recettes de cuisine',
+                icon: 'fa6-solid:carrot',
+                to: '/recipes',
+            },
             {
                 label: 'Catégories',
                 type: 'label',
@@ -417,30 +422,17 @@
             },
         ]
     ]);
+
+    const updateIsLeftMenuOpen = (value: boolean) => {
+        isLeftMenuOpen.value = value
+    };
 </script>
 
 <template>
     <header>
         <section class="flex flex-row justify-start items-center w-full min-h-28 px-6 bg-(--color-bg) fixed gap-6">
-            <LayoutsOrganismsHeaderLeftMenu :is-menu-open="isMenuOpen" @is-menu-open="updateIsMenuOpen" />
-            <div class="flex flex-row justify-end items-center w-full px-6 gap-6">
-                <div>
-                    <label for="searchInput" class="sr-only">Search a product</label>
-                    <form action="/products" method="get">
-                        <label for="searchInput" class="sr-only">Search a product</label>
-                        <UInput id="searchInput" v-bind:as="search" type="search" name="q"
-                            placeholder="Search a product" color="neutral" variant="outline" size="md"
-                            trailing-icon="fa6-solid:magnifying-glass" :ui="{
-                                base: 'w-auto h-auto pl-4 pr-12 rounded-lg',
-                                trailing: 'absolute top-0 right-2',
-                                trailingIcon: 'text-xl',
-                            }" />
-                    </form>
-                </div>
-                <UIcon name="fa6-solid:ellipsis-vertical" class="text-2xl" />
-                <UAvatar icon="fa6-solid:circle-user" class="text-2xl" />
-            </div>
+            <HeaderLeftMenu :items="items" :is-menu-open="isLeftMenuOpen" @is-menu-open="updateIsLeftMenuOpen" />
+            <HeaderRightMenu />
         </section>
-        <HeaderMenu v-if="isMenuOpen == true" :items="items" />
     </header>
 </template>

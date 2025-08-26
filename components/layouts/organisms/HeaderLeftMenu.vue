@@ -1,13 +1,20 @@
 <script setup lang="ts">
+    import type { ArrayOrNested, NavigationMenuItem } from '@nuxt/ui';
+    import HeaderMobileMenuMolecule from '../molecules/HeaderMobileMenuMolecule.vue';
     import { capitalize } from 'vue';
+
+    defineProps<{
+        items: ArrayOrNested<NavigationMenuItem> | undefined
+    }>();
 
     const isMenuOpen = defineModel<boolean>('isMenuOpen'),
         emit = defineEmits<{
             isMenuOpen: [value: boolean]
-        }>(),
-        headerMenuOpen = () => {
-            emit('isMenuOpen', isMenuOpen.value = !isMenuOpen.value)
-        }
+        }>();
+
+    const headerMenuOpen = () => {
+        emit('isMenuOpen', isMenuOpen.value = !isMenuOpen.value)
+    };
 </script>
 
 <template>
@@ -21,4 +28,5 @@
     <a href="/">
         <span class="title text-3xl font-semibold text-(--color-logo)">{{ capitalize('epices du Monde') }}</span>
     </a>
+    <HeaderMobileMenuMolecule v-show="isMenuOpen == true" :items="items" />
 </template>

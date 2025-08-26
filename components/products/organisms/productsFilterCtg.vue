@@ -14,12 +14,9 @@
             }>
         }>
     }>();
-    const emit = defineEmits<{
-        id: [value: string]
-    }>();
 
     const { currentRoute, push } = useRouter();
-    const filteredCategories = reactive<{}[]>([]),
+    const filteredCategories = reactive<Array<string>>([]),
         productSelectValue = ref<string>('pertinence');
 
     const updateSelectValue = (v: string) => {
@@ -28,11 +25,11 @@
 
     const submitCategories = (value: string) => {
         const index = filteredCategories.indexOf(value);
-        index > -1 ? filteredCategories.splice(index, 1) : filteredCategories.push(value);
+        index > -1 ? filteredCategories.splice(index, 1) : filteredCategories.push(value)
     };
 
     const updateCategoriesState = (parameter: string, value: any) => {
-        if (filteredCategories.length == 0) {
+        if (!filteredCategories) {
             resetQuery()
         } else {
             push({
@@ -45,13 +42,14 @@
     },
         resetQuery = () => {
             push({
-                query: {}
+                query: {},
             })
-        }, resetCategoriesState = () => {
+        },
+        resetCategoriesState = () => {
             resetQuery();
             console.log(filteredCategories)
         },
-        checkCategoriesCheckedState = (array: { children: any[]; }[]) => {
+        checkCategoriesCheckedState = (array: { children: Array<{ id: number, label: string, value: string, checked?: boolean }> }[]) => {
             array.map((obj: { children: any[]; }) => {
                 const findIndex = obj.children.findIndex((item: { checked: boolean; }) => item.checked == true);
                 if (findIndex > -1) {
@@ -64,8 +62,8 @@
         checkCategoriesCheckedState(props.categoriesList)
     })
 
-    onUpdated(() => {
-        console.log(filteredCategories)
+    watch(filteredCategories, (newValue) => {
+        console.log(newValue)
     })
 </script>
 
@@ -82,7 +80,7 @@
         <fieldset>
             <ProductsSelectMenu :select-value="productSelectValue" @change="updateSelectValue" />
         </fieldset>
-        <ProductsMoleculesProductsMoleculeCollapsible :filtered-categories="filteredCategories"
-            :categories-list="categoriesList" />
+        <ProductsMoleculesProductsMoleculeCollapsible :filtered-categories="filteredCategories" :categories-list="categoriesList"
+            @tag="submitCategories" />
     </form>
 </template>

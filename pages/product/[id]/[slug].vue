@@ -1,7 +1,8 @@
 <script setup lang="ts">
-    import { UContainer } from '#components';
+    import ProductContainerOrganism from '~/components/product/organisms/productContainerOrganism.vue';
 
     const { id } = useRoute().params,
+        toast = useToast(),
         { $directus, $readItem, $readFile } = useNuxtApp();
 
     const { data: product } = await useAsyncData('Product', () => {
@@ -58,25 +59,63 @@
 
     const productAssemble = () => {
         const type = availabilityTypeList.filter((type) => type.value === product.value?.availability)[0];
-        if(product.value && img.value)
-        productList.push({
-            id: product.value.id,
-            title: product.value.title,
-            description: product.value.description,
-            ingredients: product.value.ingredients,
-            slug: product.value.slug,
-            origine: product.value.origine,
-            marque: product.value.marque,
-            poids_net: product.value.poids_net,
-            price: product.value.price,
-            price_per_kg: product.value.price_per_kg,
-            reduction_rate: product.value.reduction_rate,
-            old_price: product.value.old_price,
-            stock: product.value.stock,
-            availability: type,
-            image: img.value.data,
-        })
+        if (product.value && img.value)
+            productList.push({
+                id: product.value.id,
+                title: product.value.title,
+                description: product.value.description,
+                ingredients: product.value.ingredients,
+                slug: product.value.slug,
+                origine: product.value.origine,
+                marque: product.value.marque,
+                poids_net: product.value.poids_net,
+                price: product.value.price,
+                price_per_kg: product.value.price_per_kg,
+                reduction_rate: product.value.reduction_rate,
+                old_price: product.value.old_price,
+                stock: product.value.stock,
+                availability: type,
+                image: img.value.data,
+            })
     };
+
+    const productNumber = ref<number>(1);
+
+    const addToCart = (nb: number) => {
+        const { code, msg } = useCartStore().aAddToShoppingCart(id.toLocaleString(), nb);
+        showToast(code, msg)
+    },
+        showToast = (code: number, msg: string) => {
+            if (code === 200) {
+                toast.add({
+                    title: msg,
+                    description: '',
+                    actions: [{
+                        icon: '',
+                        label: '',
+                        color: 'success',
+                        variant: 'outline',
+                        onClick(event) {
+                            event.stopPropagation()
+                        },
+                    }]
+                })
+            } else if (code === 400) {
+                toast.add({
+                    title: msg,
+                    description: 'Too bad!',
+                    actions: [{
+                        icon: 'i-lucide-refresh-cw',
+                        label: 'Retry',
+                        color: 'error',
+                        variant: 'outline',
+                        onClick(event) {
+                            event.stopPropagation()
+                        },
+                    }]
+                })
+            }
+        };
 
     onMounted(() => {
         product ? img : ''
@@ -85,15 +124,5 @@
 </script>
 
 <template>
-    <UContainer v-for="(product, i) of productList" class="flex flex-col items-center w-full h-full gap-2"
-        :key="i + product.id">
-        <h1 class="text-5xl font-semibold">{{ product.title }}</h1>
-        <section class="flex flex-col items-center w-full h-auto gap-6">
-            <nuxt-picture v-for="(img, i) of product.image" legacy-format="image"
-                :src="`http://localhost:3000/directus/assets/${img.id}`"
-                :img-attrs="{ id: img.id, class: 'rounded-xl' }" :alt="img.description" :key="i + img.id" />
-            <product-components-product-infos-modal :product="product" />
-            <ProductComponentsProductDescriptionModal :source="product.description" />
-        </section>
-    </UContainer>
+    <ProductContainerOrganism :product-list="productList" v-model="productNumber" @change="addToCart" />
 </template>
