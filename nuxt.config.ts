@@ -1,4 +1,5 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+
 export default defineNuxtConfig({
   compatibilityDate: "2025-05-15",
   devtools: { enabled: false },
@@ -11,6 +12,8 @@ export default defineNuxtConfig({
     "@pinia/nuxt",
     "@vueuse/motion/nuxt",
     "@nuxtjs/mdc",
+    "@nuxtjs/i18n",
+    "@nuxtjs/device",
   ],
   css: ["~/assets/css/main.css"],
   mdc: {
@@ -18,16 +21,27 @@ export default defineNuxtConfig({
       prose: true,
     },
   },
+  i18n: {
+    locales: [
+      { code: "en", language: "en-US", name: "English", file: "en.json" },
+      { code: "fr", language: "fr-FR", name: "Français", file: "fr.json" },
+    ],
+    defaultLocale: "fr",
+    strategy: "no_prefix",
+  },
   runtimeConfig: {
     public: {
-      apiBase: "localhost:8055",
+      apiBase: process.env.NUXT_API_ENDPOINT || "http://localhost:3000/directus",
       motion: {
         directives: {},
       },
     },
   },
   routeRules: {
-    "/directus/**": { proxy: `${import.meta.env.API_URL}/**` },
+    "/directus/**": {
+      proxy: `${import.meta.env.NUXT_DIRECTUS_API}/**`,
+      prerender: true,
+    },
   },
   app: {
     head: {
@@ -39,5 +53,6 @@ export default defineNuxtConfig({
       charset: "utf-16",
       viewport: "width=device-width, initial-scale=1, maximum-scale=1",
     },
+    baseURL: "/",
   },
 });

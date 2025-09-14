@@ -1,14 +1,16 @@
 <script setup lang="ts">
-    import type { ArrayOrNested, NavigationMenuItem } from '@nuxt/ui';
+import type { ArrayOrNested, NavigationMenuItem } from '@nuxt/ui';
+import HeaderTitleLink from '../atoms/HeaderTitleLink.vue';
 
-    defineProps<{
-        items: ArrayOrNested<NavigationMenuItem> | undefined
-    }>();
+defineProps<{
+    items: ArrayOrNested<NavigationMenuItem> | undefined
+}>();
 </script>
 
 <template>
     <div id="mobile-menu"
         class="block w-auto min-w-[15rem] h-auto max-h-[90vh] bg-(--color-bg) absolute top-full left-0 overflow-y-scroll z-50">
+        <HeaderTitleLink />
         <UNavigationMenu highlight highlight-color="primary" orientation="vertical" :items="items" :ui="{
             label: 'text-3xl font-semibold',
             childList: 'sm:w-96',

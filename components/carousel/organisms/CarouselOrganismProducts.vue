@@ -1,9 +1,10 @@
 <script setup lang="ts">
     const props = defineProps<{
         categorieParams: string,
-    }>();
-
-    const carouselProduct = reactive<{
+    }>(),
+    config = useRuntimeConfig(),
+    apiPublicEndpoint = config.public.apiBase,
+    carouselProduct = reactive<{
         id: number;
         title: string;
         description: string;
@@ -55,12 +56,12 @@
                 height: number,
             }[]>([]);
 
-        const { data: categorie } = await fetch(`http://localhost:3000/directus/items/Categorie?filter[value][_eq]=${props.categorieParams}&filter[status][_eq]=published&fields=id,name,value,icon,product_id`).then(res => res.json()),
+        const { data: categorie } = await fetch(`${apiPublicEndpoint}/items/Categorie?filter[value][_eq]=${props.categorieParams}&filter[status][_eq]=published&fields=id,name,value,icon,product_id`, {}).then(res => res.json()),
             readProductCategorie = await Promise.all(
                 categorie.map(async (obj: { product_id: number[]; }) => {
                     await Promise.all(
                         obj.product_id.map(async (value: number) => {
-                            await fetch(`http://localhost:3000/directus/items/Product_Categorie?filter[id][_eq]=${value}`)
+                            await fetch(`${apiPublicEndpoint}/items/Product_Categorie?filter[id][_eq]=${value}`, {})
                                 .then(res => res.json())
                                 .then(res => res.data)
                                 .then(res => productsCategories.push(res.reduce((acc: any, value: any) => acc + value)))
@@ -70,7 +71,7 @@
             ),
             readProduct = await Promise.all(
                 productsCategories.map(async (item: { Product_id: string; }) => {
-                    await fetch(`http://localhost:3000/directus/items/Product?filter[id][_eq]=${item.Product_id}&filter[status][_eq]=published&sort[-date_updated]`)
+                    await fetch(`${apiPublicEndpoint}/items/Product?filter[id][_eq]=${item.Product_id}&filter[status][_eq]=published&sort[-date_updated]`, {})
                         .then(res => res.json())
                         .then(res => res.data)
                         .then(res => tempProducts.push(res.reduce((acc: any, value: any) => acc + value)))
@@ -78,7 +79,7 @@
             ),
             readImage = await Promise.all(
                 tempProducts.map(async (item: { image_id: string[]; }) => {
-                    await fetch(`http://localhost:3000/directus/files?filter[id][_eq]=${item.image_id}&filter[status][_eq]=published&fields=id,description,width,height`)
+                    await fetch(`${apiPublicEndpoint}/files?filter[id][_eq]=${item.image_id}&filter[status][_eq]=published&fields=id,description,width,height`, {})
                         .then(res => res.json())
                         .then(res => res.data)
                         .then(res => images.push(res.reduce((acc: any, value: any) => acc + value)))
@@ -114,7 +115,6 @@
 
     onMounted(() => {
         getProductIdByCategorie();
-        console.log(carouselProductTitle)
     })
 </script>
 

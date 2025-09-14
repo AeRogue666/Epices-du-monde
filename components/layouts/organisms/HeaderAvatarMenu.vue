@@ -6,7 +6,7 @@ const isUserLogged = ref<boolean>(false);
     <UCard :ui="{
         body: 'flex flex-col items-center w-full h-auto gap-4'
     }" class="absolute top-9/12 right-[0%]">
-        <UAvatar icon="fa6-solid:circle-user" class="text-5xl" />
+        <UAvatar icon="fa6-solid:circle-user" class="text-5xl" size="xl" />
         <LayoutsMoleculesHeaderAvatarMenuConnectedUserMolecule v-if="isUserLogged" />
         <LayoutsMoleculesHeaderAvatarMenuDisconnectedUserMolecule v-else />
         <LayoutsOrganismsHeaderSettingsMenu />

@@ -1,0 +1,30 @@
+{
+    "header": {
+        "skip_content": "skip to the main content",
+        "settings": {
+            "title": "settings",
+            "description": "set your experience",
+            "settings": "settings",
+            "theme": "theme",
+            "languages": "languages"
+        },
+        "cart": {
+            "title": "my cart",
+            "description": "an amazing cart",
+            "no_product": "no article found",
+            "view_cart": "view cart",
+            "reset_cart_content": "reset cart"
+        }
+    },
+    "main": {
+        "index": {
+            "title": "many choice of products",
+            "categories": "categories",
+            "promotions": "promotions",
+            "news": "news"
+        }
+    },
+    "footer": {
+
+    }
+}

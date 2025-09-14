@@ -2,13 +2,13 @@
     import type { LocationQueryValue } from 'vue-router';
 
     defineProps<{
-        search: LocationQueryValue | LocationQueryValue[]
+        search: string | undefined | LocationQueryValue | LocationQueryValue[]
     }>();
 </script>
 
 <template>
-    <div>
-        <label for="searchInput" class="sr-only">Search a product</label>
+    <div class="">
+        <!-- <label for="searchInput" class="sr-only">Search a product</label> -->
         <form action="/products" method="get">
             <label for="searchInput" class="sr-only">Search a product</label>
             <UInput id="searchInput" v-bind:as="search" type="search" name="q"
