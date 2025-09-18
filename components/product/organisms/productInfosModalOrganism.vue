@@ -1,35 +1,35 @@
 <script setup lang="ts">
-    import { capitalize } from 'vue';
+import { capitalize } from 'vue';
 
-    defineProps<{
-        product: {
-            id: number,
-            title: string,
-            description: string,
-            ingredients: string,
-            slug: string,
-            origine: string,
-            marque: string,
-            poids_net?: number,
-            price: number,
-            price_per_kg: number,
-            reduction_rate?: number,
-            old_price?: number,
-            availability: object,
-            stock: number,
-            image: object,
-            tags?: [],
-            allergies?: [],
-            nutrition?: [],
-            labels?: [],
-        }
-    }>();
+defineProps<{
+    product: {
+        id: number,
+        title: string,
+        description: string,
+        ingredients: string,
+        slug: string,
+        origine: string,
+        marque: string,
+        poids_net?: number,
+        price: number,
+        price_per_kg: number,
+        reduction_rate?: number,
+        old_price?: number,
+        stock: number,
+        availability?: { name: string; value: string; color: string; },
+        image: object,
+        tags?: [],
+        allergies?: [],
+        nutrition?: [],
+        labels?: [],
+    }
+}>();
 
-    const productNumber = defineModel({ default: 1 });
+const productNumber = defineModel({ default: 1 });
 
-    defineEmits<{
-        change: [id: number]
-    }>();
+defineEmits<{
+    change: [id: number]
+}>();
 </script>
 
 <template>
@@ -41,7 +41,7 @@
         </div>
         <div class="flex flex-col items-start my-6 gap-4">
             <span class="flex flex-row items-center text-base gap-2">
-                <UIcon name="i-fa6-solid:circle" class="size-5" :class="product.availability.color" />
+                <UIcon name="i-fa6-solid:circle" class="size-5" :class="product.availability?.color" />
                 {{ capitalize('en stock') }}: {{ product.stock }}
             </span>
             <UContainer class="flex flex-col items-center">
@@ -51,7 +51,8 @@
                         :increment="{ color: 'neutral', variant: 'solid', size: 'xl' }"
                         :decrement="{ color: 'neutral', variant: 'solid', size: 'xl' }" />
                 </UFormField>
-                <UButton color="neutral" variant="outline" size="xl" icon="fa6-solid:cart-shopping" @click.prevent="$emit('change', productNumber)"
+                <UButton color="neutral" variant="outline" size="xl" icon="fa6-solid:cart-shopping"
+                    @click.prevent="$emit('change', productNumber)"
                     class="flex items-center w-auto h-auto min-w-[12rem] text-xl p-4 border-2 border-solid border-(--color-text) rounded-lg relative">
                     {{ capitalize('ajouter au panier') }}</UButton>
             </UContainer>

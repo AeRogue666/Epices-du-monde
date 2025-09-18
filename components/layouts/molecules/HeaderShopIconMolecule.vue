@@ -3,53 +3,53 @@ import { capitalize } from 'vue';
 import HeaderCartItem from './HeaderCartItem.vue';
 import { getStorage } from '~/assets/js/storageFunctions';
 
-const shoppingCart = reactive<{
-    id: string,
-    title: string,
-    image: {
+const cartStore = useCartStore(),
+    shoppingCart = cartStore.shoppingCart,
+    newCart = ref<Array<{
         id: string,
-        description: string,
-        width?: number,
-        height?: number,
-    },
-    slug: string,
-    poids_net: number,
-    price: number,
-    price_per_kg?: number,
-    reduction_rate?: number,
-    old_price?: number,
-    stock: number,
-    availability: string,
-    product_number: number,
-}[]>([]);
+        title: string,
+        image: {
+            id: string,
+            description: string,
+            width?: number,
+            height?: number,
+        },
+        slug: string,
+        poids_net: number,
+        price: number,
+        price_per_kg?: number,
+        reduction_rate?: number,
+        old_price?: number,
+        stock: number,
+        availability: string,
+        product_number: number,
+    }>>(),
+    show = computed(() => newCart.value?.length !== null); // { shoppingCart } = storeToRefs(cartStore);
 
-const cartStore = useCartStore(); // { shoppingCart } = storeToRefs(cartStore);
-
-const deleteCartProduct = (v: string) => {
-    cartStore.deleteShoppingCartProduct(v)
+const removeCartProduct = (v: string) => {
+    cartStore.removeFromShoppingCart(v)
     console.log(v);
-},
-    show = computed(() => shoppingCart !== null);
+};
 
-onMounted(() => {
-    if (getStorage('shopping-cart')) {
-        shoppingCart?.push(getStorage('shopping-cart').reduce((acc: any, value: any) => acc + value))
-    }
-    console.log(shoppingCart, getStorage('shopping-cart'))
-});
+if (import.meta.client) {
+    newCart.value = getStorage('cart');
+    onMounted(() => {
+        console.log('show: ', show.value, ' shoppingCart: ', shoppingCart, ' newCart: ', newCart.value)
+    })
+}
 </script>
 
 <template>
     <USlideover :title="capitalize($t('header.cart.title'))"
         :description="capitalize($t('header.cart.description', shoppingCart.length))" side="right">
-        <UChip :show="show" :text="shoppingCart.length.toLocaleString()" color="info" size="3xl" position="top-right">
+        <UChip :show="show" :text="newCart?.length.toLocaleString()" color="info" size="3xl" position="top-right">
             <UButton icon="i-fa6-solid:cart-shopping" color="neutral" variant="ghost" size="xl" class="rounded-full" />
         </UChip>
 
         <template #body>
             <div :show="!show">
-                <UContainer v-for="product of shoppingCart">
-                    <HeaderCartItem :product="product" @product-id="deleteCartProduct" />
+                <UContainer v-for="product of newCart">
+                    <HeaderCartItem :product="product" @product-id="removeCartProduct" />
                 </UContainer>
             </div>
             <span v-if="show" class="text-sm">{{ capitalize($t('header.cart.no_product')) }}</span>

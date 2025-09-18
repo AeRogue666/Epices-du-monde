@@ -4,7 +4,8 @@ import ProductContainerOrganism from '~/components/product/organisms/productCont
 const { id } = useRoute().params, toast = useToast(),
     { $directus, $readItem, $readFile } = useNuxtApp(),
     config = useRuntimeConfig(),
-    apiPublicEndpoint = config.public.apiBase;
+    apiPublicEndpoint = config.public.apiBase,
+    productNumber = ref<number>(1);
 
 const { data: product } = await useAsyncData('Product', () => {
     return $directus.request($readItem('Product', id.toString()))
@@ -49,7 +50,7 @@ const productList = reactive<{
     reduction_rate?: number,
     old_price?: number,
     stock: number,
-    availability: object,
+    availability?: { name: string; value: string; color: string; },
     image: object,
     tags?: [],
     allergies?: [],
@@ -79,8 +80,6 @@ const productAssemble = () => {
             image: img.value.data,
         })
 };
-
-const productNumber = ref<number>(1);
 
 const addToCart = (nb: number) => {
     const { code, msg } = useCartStore().addToShoppingCart(id.toLocaleString(), nb);

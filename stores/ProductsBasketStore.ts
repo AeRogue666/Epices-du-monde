@@ -1,8 +1,28 @@
-import { getStorage, saveStorage } from "~/assets/js/storageFunctions";
+import { clearStorage, getStorage, saveStorage } from "~/assets/js/storageFunctions";
 
-export const useCartStore = defineStore("product-cart", {
+/* export const useCartStore = defineStore("cart", {
   state: () => ({
-    shoppingCart: [],
+    shoppingCart: reactive<
+      {
+        id: string,
+        title: string,
+        image: {
+            id: string,
+            description: string,
+            width?: number,
+            height?: number,
+        },
+        slug: string,
+        poids_net: number,
+        price: number,
+        price_per_kg?: number,
+        reduction_rate?: number,
+        old_price?: number,
+        stock: number,
+        availability: string,
+        product_number: number,
+      }[]
+    >([]),
   }),
 
   actions: {
@@ -36,15 +56,16 @@ export const useCartStore = defineStore("product-cart", {
             availability: product.availability,
             image: img,
             product_number: number,
-          }) && saveStorage("shopping-cart", final)
+          }) && saveStorage("cart", final)
         : "";
     },
     async addToShoppingCart(productId: string, productNumber: number) {
-      let shoppingCart = getStorage("shopping-cart");
+      let shoppingCart = getStorage("cart");
 
       const cart = computed(() => shoppingCart !== null);
+      console.log(cart.value);
 
-      if (cart) {
+      if (cart.value !== false) {
         // if cart isn't null, find if productId exist inside the cart*
         const productExist = shoppingCart.find(
           (obj: { id: string }) => obj.id === productId
@@ -65,14 +86,36 @@ export const useCartStore = defineStore("product-cart", {
       this.shoppingCart = [];
     },
     deleteShoppingCartProduct(value: string) {
-      this.shoppingCart?.find((i: { id: string; }) => i.id == value)
-      
-      return this.shoppingCart
-    }
-  },
-});
+      this.shoppingCart?.find((i: { id: string }) => i.id == value);
 
-/* const fetchProduct = async (id: string, number: number, final: any) => {
+      return this.shoppingCart;
+    },
+  },
+}); */
+
+let shoppingCart = reactive<
+      {
+        id: string;
+        title: string;
+        image: {
+          id: string;
+          description: string;
+          width?: number;
+          height?: number;
+        };
+        slug: string;
+        poids_net: number;
+        price: number;
+        price_per_kg?: number;
+        reduction_rate?: number;
+        old_price?: number;
+        stock: number;
+        availability: string;
+        product_number: number;
+      }[]
+    >([]);
+
+const fetchProduct = async (id: string, number: number, final: any) => {
     const product = await fetch(
         `http://localhost:3000/directus/items/Product?filter[id][_eq]=${id}&filter[status][_eq]=published&sort=date_created`
       )
@@ -85,7 +128,7 @@ export const useCartStore = defineStore("product-cart", {
         .then((res) => res.json())
         .then((res) => res.data)
         .then((res) => res.reduce((acc: any, value: any) => acc + value));
-        
+
     product ? img : "";
     product && img
       ? final.push({
@@ -93,72 +136,62 @@ export const useCartStore = defineStore("product-cart", {
           title: product.title,
           description: product.description,
           slug: product.slug,
-          origine: product.origine,
-          marque: product.marque,
           poids_net: product.poids_net,
-          ingredients: product.ingredients,
           price: product.price,
           price_per_kg: product.price_per_kg,
           reduction_rate: product.reduction_rate,
           old_price: product.old_price,
           stock: product.stock,
           availability: product.availability,
-          product_allergie: product.product_allergie,
-          product_category: product.product_category,
-          product_label: product.product_label,
-          nutrition_id: product.nutrition_id,
           image: img,
-          sort: product.sort,
-          status: product.status,
-          date_created: product.date_created,
-          date_updated: product.date_updated,
           product_number: number,
-        }) && saveStorage("shopping-cart", final)
+        }) && saveStorage("cart", final)
       : "";
-
-    console.log(product, img, final, id, number);
+    console.log('product: ', product, ' img: ', img, ' final: ', final, ' id: ', id, ' number: ', number);
     return final;
   },
-  aAddToShoppingCart = async (productId: string, productNumber: number) => {
-    let shoppingCart = getStorage("shopping-cart");
-
-    if (shoppingCart) {
-      const productExist = shoppingCart.find(
+  getShoppingCart = () => {
+    return { shoppingCart }
+  },
+  addToShoppingCart = async (productId: string, productNumber: number) => {
+    const cart = computed(() => shoppingCart !== null);
+    console.log(cart.value);
+    if (cart.value == true) { // Si shoppingCart n'est pas vide
+      const productExist = shoppingCart.findIndex(
         (obj: { id: string }) => obj.id === productId
       );
-      if (productExist) {
+      console.log('Already exist product: ', productExist);
+
+      if (productExist >= 0) { // Si le produit est déjà dans le panier
         return { code: 400, msg: "Product already in cart" };
       } else {
         await fetchProduct(productId, productNumber, shoppingCart);
         return { code: 200, msg: "Product added to cart" };
       }
-    } else {
-      shoppingCart = [];
+    } else { // Si shoppingCart est vide
       await fetchProduct(productId, productNumber, shoppingCart);
-
-      // shoppingCart.push({ id: productId, number: productNumber });
-      // saveStorage("shopping-cart", shoppingCart);
 
       return { code: 200, msg: "Product added to cart" };
     }
   },
-  aResetShoppingCart = (reset: boolean) => {
-    let shoppingCart = getStorage("shopping-cart");
-    if (reset) {
-      shoppingCart = [];
-      // return { code: 500, msg: "Cart have been eset" };
-    }
+  removeFromShoppingCart = (productId: string) => {
+    const item = shoppingCart.findIndex((obj: { id: string; }) => obj.id === productId); 
+    console.log(productId, item)
+    if(item !== -1) shoppingCart.splice(item, 1)
+  },
+  resetShoppingCart = () => {
+    shoppingCart = shoppingCart.splice(shoppingCart.length, 0);
+    clearStorage('cart');
   };
 
-export const useCartStore = defineStore("product-cart", () => {
+export const useCartStore = defineStore("cart", () => {
   computed({
     get() {
-      aAddToShoppingCart;
+      getShoppingCart;
     },
     set() {
-      aAddToShoppingCart;
+      addToShoppingCart;
     },
   });
-  return { aAddToShoppingCart, aResetShoppingCart };
+  return { addToShoppingCart, removeFromShoppingCart, resetShoppingCart, shoppingCart };
 });
- */

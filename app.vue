@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import TheHeader from './components/layouts/TheHeader.vue';
 import TheFooter from './components/layouts/TheFooter.vue';
-import { saveStorage } from './assets/js/storageFunctions';
+import { getStorage, saveStorage } from './assets/js/storageFunctions';
 
 useHeadSafe({
   link: [
@@ -27,8 +27,6 @@ useSeoMeta({
   twitterSite: '@epices-du-monde.com',
   googleSiteVerification: 'KW-vaMpUJqCPV9bqy54jn_cMkWti7eiInTwIwYhtJ88',
 });
-
-onMounted(() => saveStorage('shopping-cart', null));
 /*
 <NuxtImg src="/img/logo.png" alt="Image of the logo of Epices du Monde" width="400" height="400"
   v-slot="{ src, isLoaded, imgAttrs }">
@@ -38,6 +36,19 @@ onMounted(() => saveStorage('shopping-cart', null));
   <img v-else src="https://placehold.co/400x400" alt="placeholder">
 </NuxtImg>
 */
+/* watch(usePinia().state, (state) => {
+  saveStorage('counter', JSON.stringify(state.counter))
+}, { deep: true }); */
+
+if (import.meta.client) {
+  watch(usePinia().state, (state) => {
+    getStorage('cart', JSON.stringify(state.cart?.shoppingCart))
+  }, { deep: true });
+
+  watch(usePinia().state, (state) => {
+    saveStorage('search', state.search)
+  }, { deep: true });
+}
 </script>
 
 <template>

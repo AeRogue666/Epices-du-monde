@@ -8,12 +8,12 @@ export default defineNuxtConfig({
     "@nuxt/image",
     "@nuxt/fonts",
     "@nuxt/icon",
-    "@nuxtjs/tailwindcss",
     "@pinia/nuxt",
     "@vueuse/motion/nuxt",
     "@nuxtjs/mdc",
     "@nuxtjs/i18n",
     "@nuxtjs/device",
+    "@tailwindcss/vite",
   ],
   css: ["~/assets/css/main.css"],
   mdc: {
