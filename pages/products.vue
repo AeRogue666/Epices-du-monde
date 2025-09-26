@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { capitalize } from 'vue';
 import ProductsItem from '~/components/products/organisms/productsItem.vue';
 import ProductsFilterModal from '~/components/products/organisms/productsFilterModal.vue';
 import ProductsTagsList from '~/components/products/molecules/productsMoleculesTagsList.vue';
@@ -101,7 +100,7 @@ const image = reactive<{
         }>
     }[]>([]),
     productsList = reactive<{
-        id: number,
+        id: string,
         title: string,
         description: string,
         image: {
@@ -120,6 +119,31 @@ const image = reactive<{
             color: string,
         },
     }[]>([]);
+
+// Functions for without and with queries
+const updateTagsList = (v: number) => {
+    const find = tagsList.findIndex((obj) => obj.id === v);
+    // console.log(v, tagsList, find), updateCheckedStateToCategories(tagsList[find].label)
+    tagsList.splice(find, 1);
+},
+    productsAssemble = (product: any[], image: any[]) => {
+        product.map((obj, i) => {
+            const type = availabilityTypeList.filter((type) => type.value === obj.availability)[0];
+            const img = image.filter((item) => item.id === obj.image_id)[i];
+            return productsList.unshift({
+                id: obj.id,
+                title: obj.title,
+                description: obj.description,
+                image: img,
+                slug: obj.slug,
+                price: obj.price,
+                reduction_rate: obj.reduction_rate,
+                old_price: obj.old_price,
+                availability: type,
+            })
+        })
+    };
+
 // Without queries
 const readAllProducts = async () => {
     const products = await fetch(`${apiPublicEndpoint}/items/Product?filter[status][_eq]=published&sort=date_created`)
@@ -146,13 +170,14 @@ const readAllProducts = async () => {
                     categoriesList.push({ id: obj.id, label: obj.label, children: [] });
                     obj.children.map((value) => {
                         categories.filter((content: { id: number; }) => content.id == value).map((res: { id: number; name: string; value: string; }) => {
-                            return categoriesList[i].children.push({ id: res.id, label: res.name, value: res.value, checked: false })
+                            return categoriesList[i]?.children.push({ id: res.id, label: res.name, value: res.value, checked: false })
                         })
                     })
                 })
             };
         categories ? categoriesAssemble() : ''
     };
+
 // With queries
 const readCategoriesByQueries = async () => {
     const categories = await fetch(`${apiPublicEndpoint}/items/Categorie?filter[value][_eq]=${query.categories}`).then(res => res.json()).then(res => res.data),
@@ -175,30 +200,6 @@ const readCategoriesByQueries = async () => {
     products && image ? productsAssemble(products, image) : ''
 };
 
-// Functions for without and with queries
-const updateTagsList = (v: number) => {
-    const find = tagsList.findIndex((obj) => obj.id === v);
-    // console.log(v, tagsList, find), updateCheckedStateToCategories(tagsList[find].label)
-    tagsList.splice(find, 1);
-},
-    productsAssemble = (product: any[], image: any[]) => {
-        product.map((obj, i) => {
-            const type = availabilityTypeList.filter((type) => type.value === obj.availability)[0];
-            const img = image.filter((item) => item.id === obj.image_id)[i];
-            return productsList.unshift({
-                id: obj.id,
-                title: obj.title,
-                description: obj.description,
-                image: img,
-                slug: obj.slug,
-                price: obj.price,
-                reduction_rate: obj.reduction_rate,
-                old_price: obj.old_price,
-                availability: type,
-            })
-        })
-    };
-
 onMounted(() => {
     if (query.categories) {
         query.categories ? readCategoriesByQueries() : ''
@@ -206,12 +207,9 @@ onMounted(() => {
         query.categories && query.search ? '' : ''
     } else {
         readAllProducts();
-        console.log(productsList)
         readAllCategories();
-        console.log(categoriesList)
     }
 });
-
 watch(useRoute(), (newRoute) => {
     console.log(newRoute.query.categories)
 });
@@ -239,7 +237,12 @@ watch(useRoute(), (newRoute) => {
                         <ProductsItem :product="item" />
                     </li>
                 </ul>
-                <span v-else class="text-base font-semibold">{{ capitalize('aucun produit trouvé') }}</span>
+                <ul v-else>
+                    <li>
+                        <ProductsUiProductsItemSkeleton />
+                    </li>
+                </ul>
+                <!-- <span v-else class="text-base font-semibold">{{ capitalize('aucun produit trouvé') }}</span> -->
             </div>
         </section>
     </div>

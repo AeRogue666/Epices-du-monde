@@ -22,15 +22,15 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
-    "@directus/sdk": "^20.0.3",
+    "@directus/sdk": "^20.1.0",
     "@nuxt/fonts": "^0.11.4",
     "@nuxt/icon": "^2.0.0",
-    "@nuxt/image": "^1.10.0",
-    "@nuxt/ui": "^3.1.3",
+    "@nuxt/image": "^1.11.0",
+    "@nuxt/ui": "^3.3.4",
     "@nuxtjs/device": "^3.2.4",
-    "@nuxtjs/i18n": "^10.0.6",
-    "@nuxtjs/mdc": "^0.17.2",
-    "@pinia/nuxt": "^0.11.1",
+    "@nuxtjs/i18n": "^10.1.0",
+    "@nuxtjs/mdc": "^0.17.4",
+    "@pinia/nuxt": "^0.11.2",
     "@vueuse/motion": "^3.0.3",
     "embla-carousel-auto-height": "^8.6.0",
     "embla-carousel-autoplay": "^8.6.0",
@@ -38,14 +38,14 @@
     "markdown-it": "^14.1.0",
     "nuxt": "^4.1.2",
     "pinia": "^3.0.3",
-    "typescript": "^5.8.3",
-    "vue": "^3.5.17",
+    "typescript": "^5.9.2",
+    "vue": "^3.5.21",
     "vue-router": "^4.5.1"
   },
   "devDependencies": {
     "@iconify-json/fa6-brands": "^1.2.5",
     "@iconify-json/fa6-solid": "^1.2.3",
-    "@nuxtjs/tailwindcss": "^6.14.0",
-    "@types/node": "^24.3.1"
+    "@tailwindcss/vite": "^4.1.13",
+    "@types/node": "^24.4.0"
   }
 }

@@ -36,15 +36,11 @@ useSeoMeta({
   <img v-else src="https://placehold.co/400x400" alt="placeholder">
 </NuxtImg>
 */
-/* watch(usePinia().state, (state) => {
-  saveStorage('counter', JSON.stringify(state.counter))
-}, { deep: true }); */
 
 if (import.meta.client) {
-  watch(usePinia().state, (state) => {
-    getStorage('cart', JSON.stringify(state.cart?.shoppingCart))
+  watch(usePiniaCartStore().$state, () => {
+    usePiniaCartStore().loadCartFromLocalStorage
   }, { deep: true });
-
   watch(usePinia().state, (state) => {
     saveStorage('search', state.search)
   }, { deep: true });

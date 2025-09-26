@@ -1,4 +1,8 @@
-import { clearStorage, getStorage, saveStorage } from "~/assets/js/storageFunctions";
+import {
+  clearStorage,
+  getStorage,
+  saveStorage,
+} from "~/assets/js/storageFunctions";
 
 /* export const useCartStore = defineStore("cart", {
   state: () => ({
@@ -94,26 +98,26 @@ import { clearStorage, getStorage, saveStorage } from "~/assets/js/storageFuncti
 }); */
 
 let shoppingCart = reactive<
-      {
-        id: string;
-        title: string;
-        image: {
-          id: string;
-          description: string;
-          width?: number;
-          height?: number;
-        };
-        slug: string;
-        poids_net: number;
-        price: number;
-        price_per_kg?: number;
-        reduction_rate?: number;
-        old_price?: number;
-        stock: number;
-        availability: string;
-        product_number: number;
-      }[]
-    >([]);
+  {
+    id: string;
+    title: string;
+    image: {
+      id: string;
+      description: string;
+      width?: number;
+      height?: number;
+    };
+    slug: string;
+    poids_net: number;
+    price: number;
+    price_per_kg?: number;
+    reduction_rate?: number;
+    old_price?: number;
+    stock: number;
+    availability: string;
+    product_number: number;
+  }[]
+>([]);
 
 const fetchProduct = async (id: string, number: number, final: any) => {
     const product = await fetch(
@@ -147,41 +151,80 @@ const fetchProduct = async (id: string, number: number, final: any) => {
           product_number: number,
         }) && saveStorage("cart", final)
       : "";
-    console.log('product: ', product, ' img: ', img, ' final: ', final, ' id: ', id, ' number: ', number);
+    console.log(
+      "product: ",
+      product,
+      " img: ",
+      img,
+      " final: ",
+      final,
+      " id: ",
+      id,
+      " number: ",
+      number
+    );
     return final;
   },
   getShoppingCart = () => {
-    return { shoppingCart }
+    watch(
+      usePinia().state,
+      (state) => {
+        getStorage("cart", state.cart?.cart).map((item) =>
+          shoppingCart.push({
+            id: item.id,
+            title: item.title,
+            image: item.image,
+            slug: item.slug,
+            poids_net: item.poids_net,
+            price: item.price,
+            price_per_kg: item.price_per_kg,
+            reduction_rate: item.reduction_rate,
+            old_price: item.old_price,
+            stock: item.stock,
+            availability: item.availability,
+            product_number: item.product_number,
+          })
+        );
+      },
+      { deep: true }
+    );
+    return { shoppingCart };
   },
   addToShoppingCart = async (productId: string, productNumber: number) => {
-    const cart = computed(() => shoppingCart !== null);
+    const cart = computed(() => getShoppingCart !== null);
     console.log(cart.value);
-    if (cart.value == true) { // Si shoppingCart n'est pas vide
+    if (cart.value == true) {
+      // Si shoppingCart n'est pas vide
       const productExist = shoppingCart.findIndex(
         (obj: { id: string }) => obj.id === productId
       );
-      console.log('Already exist product: ', productExist);
+      console.log("Already exist product: ", productExist);
 
-      if (productExist >= 0) { // Si le produit est déjà dans le panier
+      if (productExist >= 0) {
+        // Si le produit est déjà dans le panier
         return { code: 400, msg: "Product already in cart" };
       } else {
         await fetchProduct(productId, productNumber, shoppingCart);
         return { code: 200, msg: "Product added to cart" };
       }
-    } else { // Si shoppingCart est vide
+    } else {
+      // Si shoppingCart est vide
       await fetchProduct(productId, productNumber, shoppingCart);
 
       return { code: 200, msg: "Product added to cart" };
     }
   },
   removeFromShoppingCart = (productId: string) => {
-    const item = shoppingCart.findIndex((obj: { id: string; }) => obj.id === productId); 
-    console.log(productId, item)
-    if(item !== -1) shoppingCart.splice(item, 1)
+    const item = shoppingCart.findIndex(
+      (obj: { id: string }) => obj.id === productId
+    );
+    console.log(productId, item);
+    if (item !== -1) shoppingCart.splice(item, 1);
   },
   resetShoppingCart = () => {
-    shoppingCart = shoppingCart.splice(shoppingCart.length, 0);
-    clearStorage('cart');
+    shoppingCart = shoppingCart.splice(0, shoppingCart.length);
+    console.log(shoppingCart);
+    saveStorage('cart', shoppingCart);
   };
 
 export const useCartStore = defineStore("cart", () => {
@@ -191,7 +234,15 @@ export const useCartStore = defineStore("cart", () => {
     },
     set() {
       addToShoppingCart;
+      removeFromShoppingCart;
+      resetShoppingCart;
+      shoppingCart;
     },
   });
-  return { addToShoppingCart, removeFromShoppingCart, resetShoppingCart, shoppingCart };
+  return {
+    addToShoppingCart,
+    removeFromShoppingCart,
+    resetShoppingCart,
+    shoppingCart,
+  };
 });

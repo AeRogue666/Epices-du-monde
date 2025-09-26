@@ -1,11 +1,66 @@
 <script setup lang="ts">
+import { getStorage } from '~/assets/js/storageFunctions';
 import ProductContainerOrganism from '~/components/product/organisms/productContainerOrganism.vue';
 
-const { id } = useRoute().params, toast = useToast(),
+const { id } = useRoute().params,
+    toast = useToast(),
+    piniaCart = usePiniaCartStore(),
+    { items, code, msg } = storeToRefs(piniaCart),
     { $directus, $readItem, $readFile } = useNuxtApp(),
     config = useRuntimeConfig(),
-    apiPublicEndpoint = config.public.apiBase,
-    productNumber = ref<number>(1);
+    apiPublicEndpoint = config.public.apiBase;
+
+const cartNumber = computed(() => items.value ? items.value.findIndex((item) => item.id == id) : -1);
+const productNumber = ref<number>(1),
+    availabilityTypeList = reactive<{
+        name: string,
+        value: string,
+        color: string,
+    }[]>([
+        {
+            name: 'Available soon',
+            value: 'soon',
+            color: 'black',
+        },
+        {
+            name: 'In stock',
+            value: 'in_stock',
+            color: 'green',
+        },
+        {
+            name: 'Out of stock',
+            value: 'out_of_stock',
+            color: 'red',
+        },
+    ]),
+    productsList = reactive<{
+        id: string,
+        title: string,
+        description: string,
+        ingredients: string,
+        slug: string,
+        origine: string,
+        marque: string,
+        poids_net?: number,
+        price: number,
+        price_per_kg: number,
+        reduction_rate?: number,
+        old_price?: number,
+        stock: number,
+        availability?: {
+            name: string,
+            value: string,
+            color: string,
+        },
+        image: {
+            id: string,
+            description: string,
+        },
+        tags?: [],
+        allergies?: [],
+        nutrition?: [],
+        labels?: [],
+    }[]>([]);
 
 const { data: product } = await useAsyncData('Product', () => {
     return $directus.request($readItem('Product', id.toString()))
@@ -14,55 +69,10 @@ const { data: product } = await useAsyncData('Product', () => {
         $fetch(`${apiPublicEndpoint}/files?filter[id][_eq]=${product.value?.image_id}&fields=id,description,width,height`)
     );
 
-const availabilityTypeList = reactive<{
-    name: string,
-    value: string,
-    color: string,
-}[]>([
-    {
-        name: 'Available soon',
-        value: 'soon',
-        color: 'black',
-    },
-    {
-        name: 'In stock',
-        value: 'in_stock',
-        color: 'green',
-    },
-    {
-        name: 'Out of stock',
-        value: 'out_of_stock',
-        color: 'red',
-    },
-]);
-
-const productList = reactive<{
-    id: number,
-    title: string,
-    description: string,
-    ingredients: string,
-    slug: string,
-    origine: string,
-    marque: string,
-    poids_net?: number,
-    price: number,
-    price_per_kg: number,
-    reduction_rate?: number,
-    old_price?: number,
-    stock: number,
-    availability?: { name: string; value: string; color: string; },
-    image: object,
-    tags?: [],
-    allergies?: [],
-    nutrition?: [],
-    labels?: [],
-}[]>([]);
-
-
 const productAssemble = () => {
     const type = availabilityTypeList.filter((type) => type.value === product.value?.availability)[0];
     if (product.value && img.value)
-        productList.push({
+        productsList.push({
             id: product.value.id,
             title: product.value.title,
             description: product.value.description,
@@ -82,8 +92,10 @@ const productAssemble = () => {
 };
 
 const addToCart = (nb: number) => {
-    const { code, msg } = useCartStore().addToShoppingCart(id.toLocaleString(), nb);
-    showToast(code, msg)
+    // const { code, msg } = useCartStore().addToShoppingCart(id.toLocaleString(), nb);
+    // showToast(code, msg)
+    piniaCart.addItem(id, nb);
+    showToast(code.value, msg.value);
 },
     showToast = (code: number, msg: string) => {
         if (code === 200) {
@@ -121,8 +133,14 @@ onMounted(() => {
     product ? img : ''
     product && img ? productAssemble() : ''
 })
+
+if (import.meta.client) {
+    usePiniaCartStore().loadCartFromLocalStorage
+}
 </script>
 
 <template>
-    <ProductContainerOrganism :product-list="productList" v-model="productNumber" @change="addToCart" />
+    <ProductUiProductSkeleton v-if="productsList.length == 0" />
+    <ProductContainerOrganism v-else :products-list="productsList" :cart-number="cartNumber" v-model="productNumber"
+        @change-products-number="addToCart" />
 </template>

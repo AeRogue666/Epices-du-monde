@@ -29,6 +29,7 @@ export default defineNuxtConfig({
     defaultLocale: "fr",
     strategy: "no_prefix",
   },
+  plugins: [],
   runtimeConfig: {
     public: {
       apiBase: process.env.NUXT_API_ENDPOINT || "http://localhost:3000/directus",

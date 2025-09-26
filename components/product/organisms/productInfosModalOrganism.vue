@@ -22,14 +22,14 @@ defineProps<{
         allergies?: [],
         nutrition?: [],
         labels?: [],
-    }
+    },
+    cartNumber: number,
 }>();
-
-const productNumber = defineModel({ default: 1 });
 
 defineEmits<{
-    change: [id: number]
+    change: [id: number],
 }>();
+const productNumber = defineModel({ default: 1 });
 </script>
 
 <template>
@@ -51,10 +51,13 @@ defineEmits<{
                         :increment="{ color: 'neutral', variant: 'solid', size: 'xl' }"
                         :decrement="{ color: 'neutral', variant: 'solid', size: 'xl' }" />
                 </UFormField>
-                <UButton color="neutral" variant="outline" size="xl" icon="fa6-solid:cart-shopping"
-                    @click.prevent="$emit('change', productNumber)"
+                <UButton v-if="cartNumber < 0" color="neutral" variant="outline" size="xl"
+                    icon="fa6-solid:cart-shopping" @click.prevent="$emit('change', productNumber)"
                     class="flex items-center w-auto h-auto min-w-[12rem] text-xl p-4 border-2 border-solid border-(--color-text) rounded-lg relative">
                     {{ capitalize('ajouter au panier') }}</UButton>
+                <UButton v-else color="neutral" variant="outline" size="xl" icon="fa6-solid:cart-shopping"
+                    class="flex items-center w-auto h-auto min-w-[12rem] text-xl p-4 rounded-lg relative">
+                    {{ capitalize('déjà dans le panier') }}</UButton>
             </UContainer>
         </div>
     </UContainer>
