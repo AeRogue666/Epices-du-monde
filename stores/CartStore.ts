@@ -1,52 +1,81 @@
-import {
-  clearStorage,
-  getStorage,
-  saveStorage,
-} from "~/assets/js/storageFunctions";
+import { getStorage, saveStorage } from "~/assets/js/storageFunctions";
+
+interface Cart {
+  id: string;
+  title: string;
+  description: string;
+  image: Image;
+  slug: string;
+  poids_net: number;
+  price: number;
+  price_per_kg?: number;
+  reduction_rate?: number;
+  old_price?: number;
+  stock: number;
+  availability?: Availability;
+  product_number: number;
+}
+
+interface Image {
+  id: string;
+  description: string;
+  width?: number;
+  height?: number;
+}
+
+interface AvailabilityList {
+  name: string;
+  value: string;
+  color: string;
+}
+
+interface Availability {
+  name: string;
+  value: string;
+  color: string;
+}
+
+const availabilityList = reactive<AvailabilityList[]>([
+  {
+    name: "Available soon",
+    value: "soon",
+    color: "black",
+  },
+  {
+    name: "In stock",
+    value: "in_stock",
+    color: "green",
+  },
+  {
+    name: "Out of stock",
+    value: "out_of_stock",
+    color: "red",
+  },
+]);
 
 export const usePiniaCartStore = defineStore("pinia-cart", {
   state: () => ({
-    items: reactive<
-      {
-        id: string;
-        title: string;
-        description: string;
-        image: {
-          id: string;
-          description: string;
-          width?: number;
-          height?: number;
-        };
-        slug: string;
-        poids_net: number;
-        price: number;
-        price_per_kg?: number;
-        reduction_rate?: number;
-        old_price?: number;
-        stock: number;
-        availability: string;
-        product_number: number;
-      }[]
-    >([]),
+    cart: reactive<Cart[]>([]),
+    availibility: ref<Availability>(),
     code: 0,
-    msg: '',
+    msg: "",
   }),
   getters: {
     loadCartFromLocalStorage() {
-      this.items = getStorage("cart");
-      console.log(this.items);
+      this.cart = getStorage("cart");
+      console.log(this.cart);
     },
     saveCartToLocalStorage() {
-      saveStorage("cart", this.items);
+      saveStorage("cart", this.cart);
     },
-    cartTotal() {
-      return this.items.reduce(
+    cartTotal(): Array<Cart> {
+      return this.cart.reduce(
         (total: any, item: { price: number }) => total + item.price,
         0
       );
     },
-    cartItemsCount() {
-      return this.items.length;
+    cartItemsCount(): number {
+      return this.cart.length;
     },
   },
   actions: {
@@ -66,8 +95,11 @@ export const usePiniaCartStore = defineStore("pinia-cart", {
             .then((res) => res.reduce((acc: any, value: any) => acc + value));
 
         if (product) img;
-        if (product && img)
-          this.items.push({
+        if (product && img) {
+          this.availibility = availabilityList.filter(
+            (item) => item.value == product.availability
+          )[0];
+          this.cart.push({
             id: product.id,
             title: product.title,
             description: product.description,
@@ -78,35 +110,36 @@ export const usePiniaCartStore = defineStore("pinia-cart", {
             reduction_rate: product.reduction_rate,
             old_price: product.old_price,
             stock: product.stock,
-            availability: product.availability,
+            availability: this.availibility,
             image: img,
             product_number: number,
           }) && this.saveCartToLocalStorage;
+        }
       };
 
-      if (this.items.length !== 0) {
-        const isValueExist = this.items.findIndex((item) => item.id == id);
+      if (this.cart.length !== 0) {
+        const isValueExist = this.cart.findIndex((item) => item.id == id);
         if (isValueExist > -1) {
           // return { code: 400, msg: "Product already in cart" };
-          return this.code = 400, this.msg = "Product already in cart"
+          return (this.code = 400), (this.msg = "Product already in cart");
         } else {
           fetchProduct(id, nb);
           // return { code: 200, msg: "Product added to cart" };
-          return this.code = 200, this.msg = "Product added to cart"
+          return (this.code = 200), (this.msg = "Product added to cart");
         }
       } else {
         fetchProduct(id, nb);
         // return { code: 200, msg: "Product added to cart" };
-        return this.code = 200, this.msg = "Product added to cart"
+        return (this.code = 200), (this.msg = "Product added to cart");
       }
     },
     removeItem(id: string) {
-      this.items = this.items.filter((item: { id: string }) => item.id !== id);
-      this.saveCartToLocalStorage
+      this.cart = this.cart.filter((item: { id: string }) => item.id !== id);
+      this.saveCartToLocalStorage;
     },
     clearCart() {
-      this.items = [];
-      this.saveCartToLocalStorage
+      this.cart = this.cart.splice(0, this.cart.length);
+      this.saveCartToLocalStorage;
     },
   },
 });

@@ -1,16 +1,15 @@
 <script setup lang="ts">
-import { getStorage } from '~/assets/js/storageFunctions';
 import ProductContainerOrganism from '~/components/product/organisms/productContainerOrganism.vue';
 
 const { id } = useRoute().params,
     toast = useToast(),
     piniaCart = usePiniaCartStore(),
-    { items, code, msg } = storeToRefs(piniaCart),
+    { cart, code, msg } = storeToRefs(piniaCart),
     { $directus, $readItem, $readFile } = useNuxtApp(),
     config = useRuntimeConfig(),
     apiPublicEndpoint = config.public.apiBase;
 
-const cartNumber = computed(() => items.value ? items.value.findIndex((item) => item.id == id) : -1);
+const cartNumber = computed(() => cart.value ? cart.value.findIndex((item) => item.id == id) : -1);
 const productNumber = ref<number>(1),
     availabilityTypeList = reactive<{
         name: string,

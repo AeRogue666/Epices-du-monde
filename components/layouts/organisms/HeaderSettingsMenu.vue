@@ -1,22 +1,5 @@
 <script setup lang="ts">
 import { capitalize } from 'vue';
-
-const themeItems = ref([
-  {
-    label: "Clair",
-    value: "light",
-  },
-  {
-    label: "Sombre",
-    value: "dark",
-  },
-]),
-  themeValue = ref("light"),
-  themeStore = useThemeStore();
-
-watch(themeValue, (newValue) => {
-  themeStore.updateUserTheme(newValue);
-});
 </script>
 
 <template>
@@ -26,10 +9,7 @@ watch(themeValue, (newValue) => {
       {{ capitalize($t('header.settings.settings')) }}
     </UButton>
     <template #body>
-      <UContainer class="flex flex-col items-start">
-        <span class="text-lg font-semibold">{{ capitalize($t('header.settings.theme')) }}</span>
-        <USelect v-model="themeValue" :items="themeItems" class="w-48" />
-      </UContainer>
+      <LayoutsMoleculesThemeModeMolecule />
       <UContainer>
         <span>{{ capitalize($t('header.settings.languages')) }}</span>
         <LayoutsMoleculesLanguageSwitcher />

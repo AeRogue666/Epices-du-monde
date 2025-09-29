@@ -27,8 +27,9 @@
 
 <template>
     <a :href="`/product/${product.id}/${product.slug}`"
-        class="flex w-72 h-[26.675rem] no-hunderline hover:text-blue-600">
+        class="flex w-72 h-[26.675rem] border-none no-hunderline hover:text-blue-600">
         <UCard class="flex flex-col items-center w-full h-auto" :ui="{
+            root: 'bg-(--color-semi-transparent) ring-transparent', // bg-unset
             header: 'mt-auto',
             body: 'h-full mt-auto',
             footer: 'mt-auto'

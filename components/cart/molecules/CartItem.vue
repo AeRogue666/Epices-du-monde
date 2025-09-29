@@ -19,7 +19,7 @@ defineProps<{
         reduction_rate?: number,
         old_price?: number,
         stock: number,
-        availability: string,
+        availability?: any,
         product_number: number,
     },
 }>();
@@ -35,7 +35,7 @@ const config = useRuntimeConfig(),
 <template>
     <UCard class="flex flex-row items-center w-full h-auto" :ui="{
         header: 'p-0 sm:p-0',
-        body: 'p-0 sm:p-0 md:mx-6',
+        body: 'w-full h-auto p-0 sm:p-0 md:mx-6',
         footer: 'p-0 ml-auto mr-6 sm:p-0'
     }">
         <template #header>
@@ -52,15 +52,19 @@ const config = useRuntimeConfig(),
         </template>
 
         <a :href="`/product/${product.id}/${product.slug}`"
-            class="flex flex-col items-center no-underline gap-4 hover:text-blue-600">
-            <h2 class="w-max text-base font-semibold">{{ capitalize(product.title) }}</h2>
-            <div class="flex flex-row items-center">
-                <span class="text-base">{{ product.price }}€ </span>
-                <span class="text-base">/ {{ product.product_number }}</span>
+            class="flex flex-col items-baseline w-full h-full no-underline gap-4 hover:text-blue-600">
+            <h2 class="w-max text-xl font-semibold">{{ capitalize(product.title) }}</h2>
+            <div class="flex flex-row justify-between items-center w-full h-full">
+                <span class="text-base">{{ capitalize('price') }}: {{ product.price }}€ </span>
+                <span class="text-base">{{ capitalize('number') }}: {{ product.product_number }}</span>
             </div>
         </a>
 
         <template #footer>
+            <div class="flex flex-row items-center w-full gap-4">
+                <UIcon name="fa6-solid:circle" :style="`color: ${product.availability.color}`" />
+                <span class="text-base font-semibold">{{ product.availability.name }}</span>
+            </div>
             <div class="flex flex-col items-center">
                 <UButton color="error" variant="ghost" size="xl" icon="i-fa6-solid:trash-can"
                     @click.prevent="$emit('productId', product.id)" />

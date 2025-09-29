@@ -6,7 +6,7 @@ const { search } = useSearchQueryStore(),
     // cartStore = useCartStore(),
     // shoppingCart = cartStore.shoppingCart,
     piniaCart = usePiniaCartStore(),
-    { items, cartTotal, cartItemsCount } = storeToRefs(piniaCart),
+    { cart, cartTotal, cartItemsCount } = storeToRefs(piniaCart),
     { isDesktop, isDesktopOrTablet, isTablet, isMobileOrTablet, isMobile } = useDevice();
 
 const isAvatarMenuOpen = ref<boolean>(false),
@@ -49,7 +49,7 @@ const isAvatarMenuOpen = ref<boolean>(false),
     product_number: number,
 }[]>), */
 // show = computed(() => newCart.length !== undefined); // { shoppingCart } = storeToRefs(cartStore);
-const show = computed(() => items.value.length !== 0);
+const show = computed(() => cart.value.length !== 0);
 
 const updateAvatarMenu = () => {
     isAvatarMenuOpen.value = !isAvatarMenuOpen.value
@@ -65,7 +65,7 @@ resetCartProduct = () => {
 
 if (import.meta.client) {
     watch(usePiniaCartStore().$state, (state) => {
-        console.log(items.value, state)
+        console.log(cart.value, state)
     });
     /* watch(usePinia().state, (state) => {
         getStorage('cart', state.cart?.cart)
@@ -118,7 +118,7 @@ if (import.meta.client) {
         <LayoutsMoleculesHeaderSearchBarDesktopVersion v-if="isDesktop" :search="search" />
         <!-- <LayoutsMoleculesHeaderShopIconMolecule :new-cart="newCart" :show="show" :shopping-cart="shoppingCart"
             @cart-product-id="removeCartProduct" @cart-reset="resetCartProduct" /> -->
-        <LayoutsMoleculesHeaderPiniaShopIconMocule :items="items" :total="cartTotal" :count="cartItemsCount"
+        <LayoutsMoleculesHeaderPiniaShopIconMocule :items="cart" :total="cartTotal" :count="cartItemsCount"
             :show="show" @cart-reset="piniaCart.clearCart" @product-id="piniaCart.removeItem" />
         <UAvatar icon="fa6-solid:circle-user" class="text-4xl" size="xl" @click.prevent="updateAvatarMenu" />
         <HeaderAvatarMenu v-if="isAvatarMenuOpen == true" />

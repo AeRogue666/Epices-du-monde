@@ -2,6 +2,12 @@
 @import "@nuxt/ui";
 @import "./base.css";
 
+@theme {
+  --ui-bg: var(--color-bg);
+  --ui-error: oklch(0.56 0.1973 26.4);
+  --ui-warning: oklch(0.6996 0.201959 44.4414);
+}
+
 *,
 *::before,
 *::after {
@@ -143,3 +149,4 @@ li {
 .green {
   background-color: var(--secondary-color-3);
 }
+

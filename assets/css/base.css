@@ -4,11 +4,13 @@
   --secondary-color-1: oklch(0.8258 0.170087 82.1817);
   --secondary-color-2: oklch(0.7135 0.1415 47.08);
   --secondary-color-3: oklch(0.7303 0.075 153.51);
-  --black: oklch(0.2562 0 0);
+  --black: oklch(16.842% 0.00002 271.152);
+  --black2: oklch(0.2562 0 0);
   --silver: oklch(0.9088 0.0035 39.48);
   --grey1: #343434;
   --grey2: #464646;
   --grey3: #575757;
+  --semi-transparent: oklch(100% 0.00011 271.152 / 0.1);
 }
 
 :root {
@@ -17,20 +19,23 @@
   --color-text: var(--black);
   --color-logo: var(--primary-color);
   --color-border: var(--grey1);
+  --color-semi-transparent: var(--semi-transparent);
 }
 
-[data-theme="light"] {
+[data-theme="light"], .light {
   --color-bg: var(--color-white);
   --color-header: var(--primary-color);
   --color-text: var(--black);
   --color-logo: var(--primary-color);
   --color-border: var(--grey1);
+  --color-semi-transparent: var(--semi-transparent);
 }
 
-[data-theme="dark"] {
+[data-theme="dark"], .dark {
   --color-bg: var(--black);
   --color-header: var(--primary-color);
   --color-text: var(--silver);
   --color-logo: var(--primary-color);
   --color-border: var(--grey2);
+  --color-semi-transparent: var(--semi-transparent);
 }

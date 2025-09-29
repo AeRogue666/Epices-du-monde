@@ -232,7 +232,7 @@ watch(useRoute(), (newRoute) => {
             </div>
             <div>
                 <ul v-if="productsList.length !== 0"
-                    class="grid grid-cols-2 items-center w-full h-auto gap-2 lg:grid-cols-3 xl:grid-cols-5 2xl:grid-cols-6">
+                    class="grid grid-cols-2 items-center w-full h-auto gap-28 lg:grid-cols-3 xl:grid-cols-5 2xl:grid-cols-6">
                     <li v-for="(item, i) of productsList" :key="i">
                         <ProductsItem :product="item" />
                     </li>
