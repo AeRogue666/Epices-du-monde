@@ -37,6 +37,12 @@ useSeoMeta({
 </NuxtImg>
 */
 
+onMounted(() => {
+  if(getStorage('cart') == undefined) {
+      saveStorage('cart', [])
+  }
+})
+
 if (import.meta.client) {
   watch(usePiniaCartStore().$state, () => {
     usePiniaCartStore().loadCartFromLocalStorage
