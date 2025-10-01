@@ -1,27 +1,31 @@
 <script setup lang="ts">
 import { UCard } from '#components';
-import { capitalize } from 'vue';
+import { capitalize, type Reactive } from 'vue';
+
+interface Cart {
+    id: string;
+    title: string;
+    description: string;
+    image: Image;
+    slug: string;
+    poids_net: number;
+    price: number;
+    price_per_kg?: number;
+    reduction_rate?: number;
+    old_price?: number;
+    stock: number;
+    availability?: Availability;
+    product_number: number;
+}
+
+interface Availability {
+  name: string;
+  value: string;
+  color: string;
+}
 
 defineProps<{
-    product: {
-        id: string,
-        title: string,
-        image: {
-            id: string,
-            description: string,
-            width?: number,
-            height?: number,
-        },
-        slug: string,
-        poids_net: number,
-        price: number,
-        price_per_kg?: number,
-        reduction_rate?: number,
-        old_price?: number,
-        stock: number,
-        availability: string,
-        product_number: number,
-    },
+    product: Reactive<Cart>,
 }>();
 
 defineEmits<{
@@ -52,11 +56,11 @@ const config = useRuntimeConfig(),
         </template>
 
         <a :href="`/product/${product.id}/${product.slug}`"
-            class="flex flex-col items-center no-underline gap-4 hover:text-blue-600">
-            <h2 class="w-max text-base font-semibold">{{ capitalize(product.title) }}</h2>
-            <div class="flex flex-row items-center">
+            class="flex flex-col items-baseline w-full h-full no-underline gap-4 hover:text-blue-600">
+            <h2 class="w-max text-xl font-semibold">{{ capitalize(product.title) }}</h2>
+            <div class="flex flex-row justify-between items-center w-full h-full">
                 <span class="text-base">{{ product.price }}€ </span>
-                <span class="text-base">/ {{ product.product_number }}</span>
+                <span class="text-base">{{ product.product_number }}</span>
             </div>
         </a>
 

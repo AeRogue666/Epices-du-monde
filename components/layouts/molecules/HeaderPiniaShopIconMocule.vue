@@ -1,9 +1,42 @@
 <script setup lang="ts">
-import { capitalize } from 'vue';
+import { capitalize, type Reactive } from 'vue';
 import HeaderCartItem from './HeaderCartItem.vue';
 
+interface Cart {
+    id: string;
+    title: string;
+    description: string;
+    image: Image;
+    slug: string;
+    poids_net: number;
+    price: number;
+    price_per_kg?: number;
+    reduction_rate?: number;
+    old_price?: number;
+    stock: number;
+    availability?: Availability;
+    product_number: number;
+}
+
+interface Availability {
+  name: string;
+  value: string;
+  color: string;
+}
+
 defineProps<{
-    items: {
+    items: Reactive<Cart[]>,
+    total: any,
+    count: any,
+    show: boolean,
+}>();
+
+defineEmits<{
+    cartReset: [value: boolean],
+    productId: [value: string],
+}>();
+
+/* {
         id: string;
         title: string;
         image: {
@@ -19,18 +52,13 @@ defineProps<{
         reduction_rate?: number;
         old_price?: number;
         stock: number;
-        availability: string;
+        availability: {
+            name: string;
+            value: string;
+            color: string;
+        };
         product_number: number;
-    }[],
-    total: any,
-    count: any,
-    show: boolean,
-}>();
-
-defineEmits<{
-    cartReset: [value: boolean],
-    productId: [value: string],
-}>();
+    }[] */
 </script>
 
 <template>

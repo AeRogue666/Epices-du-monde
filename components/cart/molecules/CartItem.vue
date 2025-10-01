@@ -27,6 +27,7 @@ defineProps<{
 defineEmits<{
     productId: [value: string]
 }>();
+const productNumber = defineModel({ default: 1 });
 
 const config = useRuntimeConfig(),
     apiPublicEndpoint = config.public.apiBase;
@@ -51,24 +52,41 @@ const config = useRuntimeConfig(),
             </a>
         </template>
 
-        <a :href="`/product/${product.id}/${product.slug}`"
+        <!-- <a :href="`/product/${product.id}/${product.slug}`"
             class="flex flex-col items-baseline w-full h-full no-underline gap-4 hover:text-blue-600">
             <h2 class="w-max text-xl font-semibold">{{ capitalize(product.title) }}</h2>
             <div class="flex flex-row justify-between items-center w-full h-full">
                 <span class="text-base">{{ capitalize('price') }}: {{ product.price }}€ </span>
                 <span class="text-base">{{ capitalize('number') }}: {{ product.product_number }}</span>
             </div>
-        </a>
+        </a> -->
+
+        <UContainer class="flex flex-col items-baseline w-full h-full no-underline gap-4">
+            <a :href="`/product/${product.id}/${product.slug}`" class="no-underline hover:text-blue-600">
+                <h2 class="w-max text-xl font-semibold">{{ capitalize(product.title) }}</h2>
+            </a>
+            <UContainer class="flex flex-row justify-between items-center w-full h-full gap-6">
+                <UFormField label="Nombre de produits" help="" class="mt-6 mb-9" required>
+                    <UInputNumber v-if="product.stock !== 0" v-model="productNumber" :default-value="1" :min="1"
+                        :max="product.stock" size="xl" placeholder="Spécifier le nombre de produits"
+                        :increment="{ color: 'neutral', variant: 'solid', size: 'xl' }"
+                        :decrement="{ color: 'neutral', variant: 'solid', size: 'xl' }" />
+                    <UInputNumber v-else v-model="product.stock" size="xl"
+                        placeholder="Ce produit n'est plus disponible"
+                        :increment="{ color: 'neutral', variant: 'solid', size: 'xl' }"
+                        :decrement="{ color: 'neutral', variant: 'solid', size: 'xl' }" disabled />
+                </UFormField>
+                <span class="text-md font-semibold">{{ capitalize('price') }}: {{ product.price }}€ </span>
+            </UContainer>
+        </UContainer>
 
         <template #footer>
-            <div class="flex flex-row items-center w-full gap-4">
+            <div
+                class="flex flex-row items-center w-full absolute top-[5%] left-[90%] gap-4 md:top-[9%] md:left-[90%] xl:top-[7.9%] xl:left-[90%] 2xl:top-[9%]">
                 <UIcon name="fa6-solid:circle" :style="`color: ${product.availability.color}`" />
-                <span class="text-base font-semibold">{{ product.availability.name }}</span>
             </div>
-            <div class="flex flex-col items-center">
-                <UButton color="error" variant="ghost" size="xl" icon="i-fa6-solid:trash-can"
-                    @click.prevent="$emit('productId', product.id)" />
-            </div>
+            <UButton color="error" variant="ghost" size="xl" icon="i-fa6-solid:trash-can" class="relative"
+                @click.prevent="$emit('productId', product.id)" />
         </template>
     </UCard>
 </template>

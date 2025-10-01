@@ -2,14 +2,14 @@
 import ProductContainerOrganism from '~/components/product/organisms/productContainerOrganism.vue';
 
 const { id } = useRoute().params,
-    toast = useToast(),
     piniaCart = usePiniaCartStore(),
-    { cart, code, msg } = storeToRefs(piniaCart),
+    { cart, error } = storeToRefs(piniaCart),
     { $directus, $readItem, $readFile } = useNuxtApp(),
     config = useRuntimeConfig(),
     apiPublicEndpoint = config.public.apiBase;
 
 const cartNumber = computed(() => cart.value ? cart.value.findIndex((item) => item.id == id) : -1);
+
 const productNumber = ref<number>(1),
     availabilityTypeList = reactive<{
         name: string,
@@ -91,42 +91,9 @@ const productAssemble = () => {
 };
 
 const addToCart = (nb: number) => {
-    // const { code, msg } = useCartStore().addToShoppingCart(id.toLocaleString(), nb);
-    // showToast(code, msg)
     piniaCart.addItem(id, nb);
-    showToast(code.value, msg.value);
-},
-    showToast = (code: number, msg: string) => {
-        if (code === 200) {
-            toast.add({
-                title: msg,
-                description: '',
-                actions: [{
-                    icon: '',
-                    label: '',
-                    color: 'success',
-                    variant: 'outline',
-                    onClick(event) {
-                        event.stopPropagation()
-                    },
-                }]
-            })
-        } else if (code === 400) {
-            toast.add({
-                title: msg,
-                description: 'Too bad!',
-                actions: [{
-                    icon: 'i-lucide-refresh-cw',
-                    label: 'Retry',
-                    color: 'error',
-                    variant: 'outline',
-                    onClick(event) {
-                        event.stopPropagation()
-                    },
-                }]
-            })
-        }
-    };
+    console.log(cart.value)
+};
 
 onMounted(() => {
     product ? img : ''
@@ -142,4 +109,5 @@ if (import.meta.client) {
     <ProductUiProductSkeleton v-if="productsList.length == 0" />
     <ProductContainerOrganism v-else :products-list="productsList" :cart-number="cartNumber" v-model="productNumber"
         @change-products-number="addToCart" />
+    <LayoutsAtomsToaster v-if="error" :event="error" />
 </template>
