@@ -1,4 +1,4 @@
-import { getStorage, saveStorage } from "~/assets/js/storageFunctions";
+import { getStorage, saveStorage } from "~/assets/ts/storageFunctions";
 
 interface Cart {
   id: string;

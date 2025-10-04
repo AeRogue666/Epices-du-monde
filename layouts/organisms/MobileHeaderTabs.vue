@@ -1,6 +1,6 @@
 <script setup lang="ts">
     import type { TabsItem } from '@nuxt/ui';
-    import { getStorage, saveStorage } from '~/assets/js/storageFunctions';
+    import { getStorage, saveStorage } from '~/assets/ts/storageFunctions';
 
     const route = useRoute(),
         router = useRouter();

@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import TheHeader from './components/layouts/TheHeader.vue';
-import TheFooter from './components/layouts/TheFooter.vue';
-import { getStorage, saveStorage } from './assets/js/storageFunctions';
+import TheHeader from './layouts/TheHeader.vue';
+import TheFooter from './layouts/TheFooter.vue';
+import { getStorage, saveStorage } from './assets/ts/storageFunctions';
 
 useHeadSafe({
   link: [
@@ -58,7 +58,7 @@ if (import.meta.client) {
     <NuxtLayout>
       <TheHeader />
 
-      <main id="#main">
+      <main id="#main"> <!-- class="min-h-[calc(100vh-calc(.25rem*16))]" -->
         <NuxtRouteAnnouncer />
         <NuxtPage />
       </main>

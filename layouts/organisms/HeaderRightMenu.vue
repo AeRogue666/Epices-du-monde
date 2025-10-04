@@ -29,14 +29,14 @@ if (import.meta.client) {
 </script>
 
 <template>
-    <div class="flex flex-row justify-end items-center w-full px-6 gap-6">
-        <LayoutsMoleculesHeaderSearchBarMobileVersion v-if="isMobile || isMobileOrTablet" :search="search" />
-        <LayoutsMoleculesHeaderSearchBarDesktopVersion v-if="isDesktop" :search="search" />
+    <UContainer class="flex flex-row justify-end items-end w-full px-6 gap-6">
+        <LayoutsMoleculesHeaderSearchBarMobileVersion v-if="isDesktop || isMobileOrTablet" :search="search" />
+        <LayoutsMoleculesHeaderSearchBarDesktopVersion v-if="!isDesktop" :search="search" />
         <!-- <LayoutsMoleculesHeaderShopIconMolecule :new-cart="newCart" :show="show" :shopping-cart="shoppingCart"
             @cart-product-id="removeCartProduct" @cart-reset="resetCartProduct" /> -->
         <LayoutsMoleculesHeaderPiniaShopIconMocule :items="cart" :total="cartTotal" :count="cartItemsCount" :show="show"
             @cart-reset="piniaCart.clearCart" @product-id="piniaCart.removeItem" />
         <UAvatar icon="fa6-solid:circle-user" class="text-4xl" size="xl" @click.prevent="updateAvatarMenu" />
         <HeaderAvatarMenu v-if="isAvatarMenuOpen == true" />
-    </div>
+    </UContainer>
 </template>

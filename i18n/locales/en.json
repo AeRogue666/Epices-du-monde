@@ -18,7 +18,8 @@
     },
     "main": {
         "index": {
-            "title": "many choice of products",
+            "title": "epices du Monde",
+            "subtitle": "many choice of products",
             "categories": "categories",
             "promotions": "promotions",
             "news": "news"
