@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { ArrayOrNested, NavigationMenuItem } from '@nuxt/ui';
-import HeaderMobileMenuMolecule from '../molecules/HeaderMobileMenuMolecule.vue';
 import { capitalize } from 'vue';
+import HeaderMobileMenuMolecule from '../molecules/HeaderMobileMenuMolecule.vue';
 import HeaderTitleLink from '../atoms/HeaderTitleLink.vue';
 
 defineProps<{

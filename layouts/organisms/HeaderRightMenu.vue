@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import HeaderPiniaShopIconMocule from '../molecules/HeaderPiniaShopIconMocule.vue';
+import HeaderSearchBarDesktopVersion from '../molecules/HeaderSearchBarDesktopVersion.vue';
+import HeaderSearchBarMobileVersion from '../molecules/HeaderSearchBarMobileVersion.vue';
 import HeaderAvatarMenu from './HeaderAvatarMenu.vue';
 
 const { search } = useSearchQueryStore(),
@@ -30,11 +33,11 @@ if (import.meta.client) {
 
 <template>
     <UContainer class="flex flex-row justify-end items-end w-full px-6 gap-6">
-        <LayoutsMoleculesHeaderSearchBarMobileVersion v-if="isDesktop || isMobileOrTablet" :search="search" />
-        <LayoutsMoleculesHeaderSearchBarDesktopVersion v-if="!isDesktop" :search="search" />
+        <HeaderSearchBarMobileVersion v-if="isDesktop || isMobileOrTablet" :search="search" />
+        <HeaderSearchBarDesktopVersion v-if="!isDesktop" :search="search" />
         <!-- <LayoutsMoleculesHeaderShopIconMolecule :new-cart="newCart" :show="show" :shopping-cart="shoppingCart"
             @cart-product-id="removeCartProduct" @cart-reset="resetCartProduct" /> -->
-        <LayoutsMoleculesHeaderPiniaShopIconMocule :items="cart" :total="cartTotal" :count="cartItemsCount" :show="show"
+        <HeaderPiniaShopIconMocule :items="cart" :total="cartTotal" :count="cartItemsCount" :show="show"
             @cart-reset="piniaCart.clearCart" @product-id="piniaCart.removeItem" />
         <UAvatar icon="fa6-solid:circle-user" class="text-4xl" size="xl" @click.prevent="updateAvatarMenu" />
         <HeaderAvatarMenu v-if="isAvatarMenuOpen == true" />
