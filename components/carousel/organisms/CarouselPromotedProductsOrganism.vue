@@ -59,6 +59,7 @@ onMounted(() => {
 
 <template>
     <UContainer class="flex flex-row items-center w-full h-auto mt-0 mb-6 gap-3">
-        <CarouselPromotedProductsMolecule :products="carouselProduct" />
+        <CarouselUiCarouselPromotedProductsSkeleton v-if="carouselProduct.length == 0" />
+        <CarouselPromotedProductsMolecule v-else :products="carouselProduct" />
     </UContainer>
 </template>

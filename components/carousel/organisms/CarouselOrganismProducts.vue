@@ -79,7 +79,7 @@ const getProductIdByCategorie = async () => {
         ),
         readImage = await Promise.all(
             tempProducts.map(async (item: { image_id: string[]; }) => {
-                await fetch(`${apiPublicEndpoint}/files?filter[id][_eq]=${item.image_id}&filter[status][_eq]=published&fields=id,description,width,height`, {})
+                await fetch(`${apiPublicEndpoint}/files?filter[id][_eq]=${item.image_id}&fields=id,description,width,height`, {})
                     .then(res => res.json())
                     .then(res => res.data)
                     .then(res => images.push(res.reduce((acc: any, value: any) => acc + value)))
@@ -112,7 +112,6 @@ const getProductIdByCategorie = async () => {
         tempProducts && images ? productAssemble() : ''
     }
 }
-
 onMounted(() => {
     getProductIdByCategorie();
 })
@@ -120,7 +119,8 @@ onMounted(() => {
 
 <template>
     <UContainer class="flex flex-col justify-center items-center w-full h-auto my-12 gap-6">
-        <CarouselAtomsCarouselAtomProductTitle :array="carouselProductTitle" />
-        <CarouselMoleculesCarouselMoleculeProduct :product="carouselProduct" :product-title="carouselProductTitle" />
+        <CarouselUiCarouselProductsSkeleton v-if="carouselProduct.length == 0 && carouselProductTitle.length == 0" />
+        <CarouselMoleculesCarouselMoleculeProduct v-else :product="carouselProduct"
+            :product-title="carouselProductTitle" />
     </UContainer>
 </template>
