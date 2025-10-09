@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import type { ArrayOrNested, NavigationMenuItem } from '@nuxt/ui';
+import type { NavigationMenuItem } from '@nuxt/ui';
 import HeaderTitleLink from '../atoms/HeaderTitleLink.vue';
+import type { ArrayOrNested } from '@nuxt/ui/runtime/types/utils.js';
 
 defineProps<{
     items: ArrayOrNested<NavigationMenuItem> | undefined
 }>();
+
 </script>
 
 <template>
@@ -16,6 +18,6 @@ defineProps<{
             childList: 'sm:w-96',
             linkLabel: 'text-base truncate',
             linkTrailingIcon: 'text-xl',
-        }" class="m-0 px-2 py-8 bg-(--color-bg) opacity-100" />
+        }" class="m-0 px-2 py-8 bg-(--color-bg) opacity-100 data-[orientation=vertical]:w-full" />
     </div>
 </template>

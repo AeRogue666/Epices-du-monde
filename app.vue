@@ -64,7 +64,7 @@ if (import.meta.client) {
       </main>
       <TheFooter>
         <template #down>
-          <span class="text-base">© 2009-2025 Epices Du Monde. Tous droits réservés.</span>
+          <span class="text-base">© 2009-{{ new Date().getFullYear() }} Epices Du Monde. Tous droits réservés.</span>
           <span class="text-base">Epices Du Monde - 4 chemin du moulon - 07200 Aubenas</span>
           <span class="text-base">Siret : 82402921900014</span>
         </template>

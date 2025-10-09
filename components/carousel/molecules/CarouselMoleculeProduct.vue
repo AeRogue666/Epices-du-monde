@@ -30,7 +30,7 @@
 
 <template>
     <CarouselAtomsCarouselAtomProductTitle :array="productTitle" />
-    <section class="flex items-center mb-auto">
+    <section class="flex flex-col justify-center items-center mb-auto">
         <UCarousel v-if="product.length !== 0" v-slot="{ item }" loop arrows dots :items="product" :ui="{
             root: 'mb-6',
             viewport: 'overflow-hidden',

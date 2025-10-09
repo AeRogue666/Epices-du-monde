@@ -19,9 +19,9 @@ interface Cart {
 }
 
 interface Availability {
-  name: string;
-  value: string;
-  color: string;
+    name: string;
+    value: string;
+    color: string;
 }
 
 defineProps<{
@@ -79,14 +79,16 @@ defineEmits<{
         </template>
 
         <template #footer>
-            <UButton color="error" variant="ghost" size="xl" icon="i-fa6-solid:trash-can"
-                @click.prevent="$emit('cartReset', true)" class="w-auto border-2 border-solid rounded-lg" :ui="{
-                    base: 'w-full'
-                }">{{ capitalize($t('header.cart.reset_cart_content')) }}</UButton>
-            <UButton color="success" variant="solid" to="/cart" size="xl" icon="i-fa6-solid:cart-shopping"
-                trailing-icon="i-fa6-solid:arrow-right" class="w-auto border-2 border-solid rounded-lg" :ui="{
-                    base: 'w-full'
-                }">{{ capitalize($t('header.cart.view_cart')) }}</UButton>
+            <UContainer class="flex flex-col xl:grid xl:grid-cols-1 items-center w-full gap-3">
+                <UButton color="error" variant="ghost" size="xl" icon="i-fa6-solid:trash-can"
+                    @click.prevent="$emit('cartReset', true)" class="w-auto border-2 border-solid rounded-lg" :ui="{
+                        base: 'w-full'
+                    }">{{ capitalize($t('header.cart.reset_cart_content')) }}</UButton>
+                <UButton color="success" variant="solid" to="/cart" size="xl" icon="i-fa6-solid:cart-shopping"
+                    trailing-icon="i-fa6-solid:arrow-right" class="w-auto border-2 border-solid rounded-lg" :ui="{
+                        base: 'w-full'
+                    }">{{ capitalize($t('header.cart.view_cart')) }}</UButton>
+            </UContainer>
         </template>
     </USlideover>
 </template>
