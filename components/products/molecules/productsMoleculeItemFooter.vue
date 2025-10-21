@@ -1,7 +1,7 @@
 <script setup lang="ts">
     defineProps<{
         product: {
-            id: number,
+            id: string,
             title: string,
             description: string,
             image: {
@@ -15,16 +15,16 @@
             reduction_rate?: number,
             old_price?: number,
             availability: {
-                name: string,
-                value: string,
-                color: string,
+                name?: string,
+                value?: string,
+                color?: string,
             },
         }
     }>();
 </script>
 
 <template>
-    <div class="flex flex-row items-center gap-6">
+    <div class="flex flex-row items-center w-auto gap-6">
         <span class="text-lg font-semibold">{{ product.price }} €</span>
         <span v-if="product.reduction_rate"
             class="absolute top-[96%] left-[11.3%] text-lg text-(--secondary-color-3) font-semibold">-{{

@@ -33,7 +33,7 @@ const productNumber = defineModel({ default: 1 });
 </script>
 
 <template>
-    <UContainer class="flex flex-col w-96 h-full border border-solid border-(--color-text)">
+    <UContainer class="flex flex-col w-full h-full border border-solid border-(--color-text)">
         <div class="flex flex-col items-start my-6 gap-4">
             <span class="text-base font-semibold">{{ product.price }} €</span>
             <span class="text-base">Poids net: {{ product.poids_net }}</span>

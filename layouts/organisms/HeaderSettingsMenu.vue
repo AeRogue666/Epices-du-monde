@@ -14,10 +14,7 @@ import LanguageSwitcher from '../molecules/LanguageSwitcher.vue';
     </UButton>
     <template #body>
       <ThemeModeMolecule />
-      <UContainer>
-        <span>{{ capitalize($t('header.settings.languages')) }}</span>
-        <LanguageSwitcher />
-      </UContainer>
+      <LanguageSwitcher />
     </template>
   </UModal>
 </template>

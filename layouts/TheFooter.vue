@@ -77,7 +77,7 @@ const columns = reactive<{
 </script>
 
 <template>
-    <UFooter class="grid grid-cols-1 xl:gap-8 w-full" :ui="{ container: 'hidden', }">
+    <UFooter class="grid grid-cols-1 xl:gap-8 w-full border-t border-default" :ui="{ container: 'hidden', }">
         <template #left>
             <div class="flex flex-col items-center mb-10 xl:mb-0">
                 <slot name="up"></slot>

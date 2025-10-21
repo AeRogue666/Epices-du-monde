@@ -13,7 +13,7 @@
 </script>
 
 <template>
-    <div class="prose">
+    <div class="prose mt-1 text-sm text-pretty text-muted">
         <div v-html="result"></div>
         <!-- <MDCRenderer :body="source" :prose="true" /> -->
     </div>

@@ -1,31 +1,41 @@
 {
-    "header": {
-        "skip_content": "passer au contenu principal",
-        "settings": {
-            "title": "paramètres",
-            "description": "paramétrer votre expérience",
-            "settings": "paramètres",
-            "theme": "thème",
-            "languages": "langues"
-        },
-        "cart": {
-            "title": "mon panier",
-            "description": "un magnifique panier",
-            "no_product": "aucun article sélectionné",
-            "view_cart": "voir le panier",
-            "reset_cart_content": "supprimer le panier"
-        }
+  "header": {
+    "skip_content": "passer au contenu principal",
+    "settings": {
+      "title": "paramètres",
+      "description": "paramétrer votre expérience",
+      "settings": "paramètres",
+      "theme": "thème",
+      "languages": "langues"
     },
-    "main": {
-        "index": {
-            "title": "epices du Monde",
-            "subtitle": "un large choix de produits",
-            "categories": "catégories",
-            "promotions": "promotions",
-            "news": "nouveautés"
-        }
-    },
-    "footer": {
-
+    "cart": {
+      "title": "mon panier",
+      "description": "un magnifique panier",
+      "no_product": "aucun article sélectionné",
+      "view_cart": "voir le panier",
+      "reset_cart_content": "supprimer le panier"
     }
+  },
+  "main": {
+    "index": {
+      "title": "epices du Monde",
+      "subtitle": "un large choix de produits",
+      "categories": "catégories",
+      "promotions": "promotions",
+      "news": "nouveautés"
+    },
+    "products": {},
+    "product": {
+      "availability": {
+        "in_stock": "en stock",
+        "out_of_stock": "rupture de stock",
+        "not_available": "non disponible"
+      },
+      "collapsible": {
+        "description": "description",
+        "ingredient": "ingredients"
+      }
+    }
+  },
+  "footer": {}
 }

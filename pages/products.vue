@@ -114,11 +114,13 @@ const image = reactive<{
         reduction_rate?: number,
         old_price?: number,
         availability: {
-            name: string,
-            value: string,
-            color: string,
+            name?: string,
+            value?: string,
+            color?: string,
         },
     }[]>([]);
+
+const productSkeletonLength = ref<number>(6);
 
 // Functions for without and with queries
 const updateTagsList = (v: number) => {
@@ -139,7 +141,11 @@ const updateTagsList = (v: number) => {
                 price: obj.price,
                 reduction_rate: obj.reduction_rate,
                 old_price: obj.old_price,
-                availability: type,
+                availability: {
+                    name: type?.name,
+                    value: type?.value,
+                    color: type?.color,
+                },
             })
         })
     };
@@ -200,6 +206,9 @@ const readCategoriesByQueries = async () => {
     products && image ? productsAssemble(products, image) : ''
 };
 
+const itemsPerPage = ref<number>(18),
+    pages = ref<number>(1 | productsList.length / itemsPerPage.value);
+
 onMounted(() => {
     if (query.categories) {
         query.categories ? readCategoriesByQueries() : ''
@@ -232,18 +241,28 @@ watch(useRoute(), (newRoute) => {
             </div>
             <div>
                 <ul v-if="productsList.length !== 0"
-                    class="grid grid-cols-2 items-center w-full h-auto gap-28 lg:grid-cols-3 xl:grid-cols-5 2xl:grid-cols-6">
+                    class="flex flex-col gap-8 lg:gap-y-16 sm:grid sm:grid-cols-2 lg:grid-cols-3">
+                    <li v-for="(product, i) of productsList" :key="i">
+                        <ProductsItem :product="product" />
+                    </li>
+                </ul> <!-- max-w-60 min-w-52 max-h-48 min-h-44 2xl:grid-cols-5 -->
+
+                <!-- <ul v-if="productsList.length !== 0"
+                    class="grid grid-cols-1 items-center w-full h-auto gap-28 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
                     <li v-for="(item, i) of productsList" :key="i">
                         <ProductsItem :product="item" />
                     </li>
-                </ul>
-                <ul v-else>
-                    <li>
-                        <ProductsUiProductsItemSkeleton />
+                </ul> -->
+                <ul v-else
+                    class="grid grid-cols-1 items-center w-full h-auto gap-28 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
+                    <li v-for="(item, i) of productSkeletonLength" :key="i">
+                        <ProductsUiProductsItemSkeleton :key="item" />
                     </li>
                 </ul>
                 <!-- <span v-else class="text-base font-semibold">{{ capitalize('aucun produit trouvé') }}</span> -->
             </div>
+            <UPagination v-model:page="pages" :items-per-page="itemsPerPage" :sibling-count="1" show-edges show-controls
+                active-color="neutral" active-variant="solid" variant="ghost" :total="productsList.length" />
         </section>
     </div>
 </template>

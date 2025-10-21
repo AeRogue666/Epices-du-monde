@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import ProductContainerOrganism from '~/components/product/organisms/productContainerOrganism.vue';
+import Toaster from '~/layouts/atoms/Toaster.vue';
 
 const { id } = useRoute().params,
     piniaCart = usePiniaCartStore(),
@@ -33,7 +34,7 @@ const productNumber = ref<number>(1),
         },
     ]),
     productsList = reactive<{
-        id: string,
+        id: string | number,
         title: string,
         description: string,
         ingredients: string,
@@ -54,6 +55,8 @@ const productNumber = ref<number>(1),
         image: {
             id: string,
             description: string,
+            width?: number,
+            height?: number,
         },
         tags?: [],
         allergies?: [],
@@ -107,7 +110,10 @@ if (import.meta.client) {
 
 <template>
     <ProductUiProductSkeleton v-if="productsList.length == 0" />
-    <ProductContainerOrganism v-else :products-list="productsList" :cart-number="cartNumber" v-model="productNumber"
+    <ProductOrganismsProductPageContent v-else :products-list="productsList" :cart-number="cartNumber" v-model="productNumber"
         @change-products-number="addToCart" />
-    <LayoutsAtomsToaster v-if="error" :event="error" />
+    <Toaster v-if="error" :event="error" />
+
+    <!-- <ProductContainerOrganism v-else :products-list="productsList" :cart-number="cartNumber" v-model="productNumber"
+        @change-products-number="addToCart" /> -->
 </template>

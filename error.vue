@@ -6,7 +6,18 @@ const route = useRoute(),
 </script>
 
 <template>
-    <UContainer class="max-w-[100rem] text-center gap-6">
+    <UError :error="{
+        statusCode: 404,
+        statusMessage: 'page not found',
+        message: `the page you are looking for doesn't exist`,
+    }" :clear="{
+        color: 'neutral',
+        size: 'xl',
+        icon: 'fa6-solid:arrow-left',
+        class: 'rounded-full',
+    }" />
+
+    <!-- <UContainer class="max-w-[100rem] text-center gap-6">
         <h1
             class="text-5xl sm:text-7xl text-pretty text-highlighted tracking-tight font-bold leading-none mb-4 sm:text-[7rem] lg:mt-16 tabular-nums text-[5rem]">
             <span class="text-error">404</span>
@@ -17,5 +28,5 @@ const route = useRoute(),
                 {{ capitalize('go back home') }}
             </ULink>
         </UContainer>
-    </UContainer>
+    </UContainer> -->
 </template>

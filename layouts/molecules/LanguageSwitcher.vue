@@ -1,13 +1,12 @@
 <script setup lang="ts">
-const { locale, locales, setLocale } = useI18n()
+import { capitalize } from 'vue';
 
-const availableLocales = computed(() => {
-  return locales.value.filter(i => i.code !== locale.value)
-})
+const { locale, locales, setLocale } = useI18n()
 </script>
 
 <template>
-    <ULink v-for="locale in availableLocales" :key="locale.code" class="w-48" @click.prevent.stop="setLocale(locale.code)">
-        {{ locale.name }}
-    </ULink>
+  <UContainer class="flex flex-row items-center gap-4">
+    <span class="text-base font-semibold">{{ capitalize($t('header.settings.languages')) }}</span>
+    <ULocaleSelect v-model="locale" :locales="locales" @update:model-value="setLocale($event)" />
+  </UContainer>
 </template>
