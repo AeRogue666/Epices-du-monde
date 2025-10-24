@@ -33,7 +33,13 @@
       },
       "collapsible": {
         "description": "description",
-        "ingredient": "ingredients"
+        "ingredient": "ingredients",
+        "technical-informations": "technical informations",
+        "allergy": "allergies",
+        "nutrition": "nutrition",
+        "brand": "brand",
+        "origin": "origin",
+        "tag": "tags"
       }
     }
   },
