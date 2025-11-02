@@ -3,7 +3,7 @@ import { capitalize } from 'vue';
 
 defineProps<{
     product: {
-        id: number,
+        id: string | number,
         title: string,
         description: string,
         ingredients: string,
@@ -16,12 +16,21 @@ defineProps<{
         reduction_rate?: number,
         old_price?: number,
         stock: number,
-        availability?: { name: string; value: string; color: string; },
-        image: object,
+        availability?: {
+            name: string,
+            value: string,
+            color: string,
+        },
+        image: {
+            id: string,
+            description: string,
+            width?: number,
+            height?: number,
+        },
         tags?: [],
         allergies?: [],
         nutrition?: [],
-        labels?: [],
+        labels?: Label[],
     },
     cartNumber: number,
 }>();
@@ -46,14 +55,14 @@ const productNumber = defineModel({ default: 1 });
         </UFormField>
         <UButton v-if="cartNumber < 0 && product.stock !== 0" color="neutral" variant="outline" size="xl"
             icon="fa6-solid:cart-shopping" @click.prevent="$emit('change', productNumber)"
-            class="flex items-center w-auto h-auto min-w-[12rem] text-xl p-4 border-2 border-solid border-(--color-text) rounded-lg relative">
+            class="flex items-center w-auto h-auto min-w-48 text-xl p-4 border-2 border-solid border-(--color-text) rounded-lg relative">
             {{ capitalize('ajouter au panier') }}</UButton>
         <UButton v-else-if="cartNumber >= 0 && product.stock !== 0" color="neutral" variant="outline" size="xl"
             icon="fa6-solid:cart-shopping"
-            class="flex items-center w-auto h-auto min-w-[12rem] text-xl p-4 rounded-lg relative">
+            class="flex items-center w-auto h-auto min-w-48 text-xl p-4 rounded-lg relative">
             {{ capitalize('déjà dans le panier') }}</UButton>
         <UButton v-else color="neutral" variant="outline" size="xl" icon="fa6-solid:cart-shopping"
-            class="flex items-center w-auto h-auto min-w-[12rem] text-xl p-4 rounded-lg relative">
+            class="flex items-center w-auto h-auto min-w-48 text-xl p-4 rounded-lg relative">
             {{ capitalize('aucun produit disponible') }}</UButton>
     </UContainer>
 </template>

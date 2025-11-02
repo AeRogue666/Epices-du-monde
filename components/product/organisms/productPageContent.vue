@@ -30,7 +30,7 @@ defineProps<{
         tags?: [],
         allergies?: [],
         nutrition?: [],
-        labels?: [],
+        labels?: Label[],
     }>,
     cartNumber: number,
 }>();
@@ -79,7 +79,10 @@ const emit = defineEmits<{
                         </div>
                     </div>
                     <div class="flex flex-row items-center">
-                        <span>Labels: {{ product.labels }}</span>
+                        <NuxtPicture v-for="(label, i) of product.labels"
+                            :src="`http://localhost:3000/directus/assets/${label?.image_id}`"
+                            class="object-cover object-top w-full h-full rounded-lg" legacy-format="image"
+                            :img-attrs="{ id: label?.id, class: 'rounded-xl' }" :alt="label?.name" width="60" height="60" :key="i" />
                     </div>
                 </UContainer>
                 <ProductOrganismsProductAddToCartForm :product="product" :cart-number="cartNumber"

@@ -56,7 +56,7 @@ export const usePiniaCartStore = defineStore("pinia-cart", {
   state: () => ({
     cart: reactive<Cart[]>([]),
     availibility: ref<Availability>(),
-    error: ref<Error>({ code: 0, msg: "", color: undefined }),
+    cartError: ref<Error>({ code: 0, msg: "", color: undefined }),
   }),
   getters: {
     loadCartFromLocalStorage() {
@@ -116,11 +116,11 @@ export const usePiniaCartStore = defineStore("pinia-cart", {
                 product_number: number,
               }),
                 this.saveCartToLocalStorage;
-              (this.error.code = 200), (this.error.msg = "Product added to cart"), this.error.color = 'success';
-              // toaster(this.error.code, this.error.msg, 'success');
+              (this.cartError.code = 200), (this.cartError.msg = "Product added to cart"), this.cartError.color = 'success';
+              // toaster(this.cartError.code, this.cartError.msg, 'success');
             } else {
-              this.error.code = 500, this.error.msg = `Product ${product.title} can not be added to cart`, this.error.color = 'error';
-              // toaster(this.error.code, this.error.msg, 'error');
+              this.cartError.code = 500, this.cartError.msg = `Product ${product.title} can not be added to cart`, this.cartError.color = 'error';
+              // toaster(this.cartError.code, this.cartError.msg, 'error');
             }
           }
         },
@@ -134,8 +134,8 @@ export const usePiniaCartStore = defineStore("pinia-cart", {
       if (this.cart.length !== 0) {
         const isValueExist = this.cart.findIndex((item) => item.id == id);
         if (isValueExist > -1) {
-          this.error.code = 400, this.error.msg = "Product already in cart", this.error.color = 'warning';
-          // toaster(this.error.code, this.error.msg, 'warning');
+          this.cartError.code = 400, this.cartError.msg = "Product already in cart", this.cartError.color = 'warning';
+          // toaster(this.cartError.code, this.cartError.msg, 'warning');
         } else {
           fetchProduct(id, nb);
         }
