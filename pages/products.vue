@@ -2,8 +2,11 @@
 import ProductsItem from '~/components/products/organisms/productsItem.vue';
 import ProductsFilterModal from '~/components/products/organisms/productsFilterModal.vue';
 import ProductsTagsList from '~/components/products/molecules/productsMoleculesTagsList.vue';
+import { capitalize } from 'vue';
+import { readItems } from '@directus/sdk';
 
 const { query } = useRoute(),
+    { $directus, $readItem, $readItems } = useNuxtApp(),
     config = useRuntimeConfig(),
     apiPublicEndpoint = config.public.apiBase;
 
@@ -120,7 +123,11 @@ const image = reactive<{
         },
     }[]>([]);
 
-const productSkeletonLength = ref<number>(6);
+const productSkeletonLength = ref<number>(6),
+    itemsPerPage = ref<number>(18),
+    pages = ref<number>(1 | productsList.length / itemsPerPage.value),
+    productLimit = ref<number>(15),
+    filterQuery = reactive(['[status][_eq]=published']);
 
 // Functions for without and with queries
 const updateTagsList = (v: number) => {
@@ -151,6 +158,54 @@ const updateTagsList = (v: number) => {
     };
 
 // Without queries
+const productsDataList = reactive<Product[]>([]);
+
+const { data: productData, status: productStatus, error: productError } = await useAsyncData('Product', async () => {
+    return $fetch(`${apiPublicEndpoint}/items/Product?filter[status][_eq]=published&sort=date_created&page=1`).then((res: any) => res.data)
+}, {
+    getCachedData(key, nuxtApp) {
+        return nuxtApp.payload.data[key] || nuxtApp.static.data[key] || null;
+    }
+});
+
+const products = await $directus.request(readItems('Product', {
+    page: pages.value,
+    limit: productLimit.value,
+    fields: ['id','status','title','description','slug','price','price_per_kg','old_price','availability','image_id','Product_Categorie','product_label']
+}))
+.then(async (res: any[]) => {
+    // map and get image_id
+    return res.map(async (item: any) => {
+        return {
+            ...item,
+            image_id: await $fetch(`${apiPublicEndpoint}/files?filter[id][_eq]=${item.image_id}&fields=id,description,width,height`).then((res: any) => res.data)
+        }
+    })
+
+    return await Promise.all(
+        res.map(async (item: any) => {
+            return await $fetch(`${apiPublicEndpoint}/files?filter[id][_eq]=${item.image_id}&fields=id,description,width,height`).then((res: any) => res.data)
+        })
+    )
+
+    return res.map((item: any) => {
+        return {
+            ...item,
+            image_id: {
+                default: `${apiPublicEndpoint}/assets/${item.image_id}`
+            },
+        }
+    })
+})
+
+/* const { data: imageData, status: imageStatus, error: imageError }= await useAsyncData('Image', async () => {
+    await Promise.all(
+        productsDataList.map(async (item) => {
+            return await $fetch(`${apiPublicEndpoint}/files?filter[id][_eq]=${item.image_id}&fields=id,description,width,height`).then((res: any) => res.data)
+        })
+    )
+}); */
+
 const readAllProducts = async () => {
     const products = await fetch(`${apiPublicEndpoint}/items/Product?filter[status][_eq]=published&sort=date_created`)
         .then(res => res.json())
@@ -206,9 +261,6 @@ const readCategoriesByQueries = async () => {
     products && image ? productsAssemble(products, image) : ''
 };
 
-const itemsPerPage = ref<number>(18),
-    pages = ref<number>(1 | productsList.length / itemsPerPage.value);
-
 onMounted(() => {
     if (query.categories) {
         query.categories ? readCategoriesByQueries() : ''
@@ -217,10 +269,14 @@ onMounted(() => {
     } else {
         readAllProducts();
         readAllCategories();
+        productData.value ? productsDataList.push(productData.value) : ''
+        // productData.value && image ? productsAssemble(productData.value, image) : ''
+
+        console.log(products)
     }
 });
 watch(useRoute(), (newRoute) => {
-    console.log(newRoute.query.categories)
+    // console.log(newRoute.query.categories)
 });
 </script>
 
@@ -233,7 +289,7 @@ watch(useRoute(), (newRoute) => {
                     <ProductsFilterModal :tags-list="categoriesList" />
                     <div class="flex flex-col items-start gap-4 xl:flex-row xl:items-center">
                         <span class="text-base">Products:
-                            <span class="font-semibold">{{ productsList.length }}</span>
+                            <span class="font-semibold">{{ productsDataList.length }}</span>
                         </span>
                     </div>
                 </div>
@@ -253,13 +309,16 @@ watch(useRoute(), (newRoute) => {
                         <ProductsItem :product="item" />
                     </li>
                 </ul> -->
+                <UEmpty v-else-if="!productsList && productStatus == 'success'"
+                    :title="capitalize('aucun produit trouvé')"
+                    :description="capitalize(`il semble qu'aucun projet n'a été trouvé.`)" icon="fa6-solid-file" />
+
                 <ul v-else
                     class="grid grid-cols-1 items-center w-full h-auto gap-28 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
                     <li v-for="(item, i) of productSkeletonLength" :key="i">
                         <ProductsUiProductsItemSkeleton :key="item" />
                     </li>
                 </ul>
-                <!-- <span v-else class="text-base font-semibold">{{ capitalize('aucun produit trouvé') }}</span> -->
             </div>
             <UPagination v-model:page="pages" :items-per-page="itemsPerPage" :sibling-count="1" show-edges show-controls
                 active-color="neutral" active-variant="solid" variant="ghost" :total="productsList.length" />

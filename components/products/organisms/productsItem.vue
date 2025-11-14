@@ -27,8 +27,8 @@ defineProps<{
 
 <template>
     <article class="relative group/blog-post rounded-lg overflow-hidden flex flex-col bg-default ring ring-default">
-        <div class="relative overflow-hidden aspect-[16/9] w-full pointer-events-none">
-            <NuxtPicture v-if="product.image" :src="`http://localhost:3000/directus/assets/${product.image.id}`"
+        <div class="relative overflow-hidden aspect-video w-full pointer-events-none">
+            <NuxtPicture v-if="product.image" :src="`directus/${product.image.id}`"
                 class="object-cover object-top w-full h-full rounded-lg" :alt="product.image.description"
                 :width="product.image.width" :height="product.image.height" />
             <NuxtImg v-else
@@ -70,7 +70,7 @@ defineProps<{
             </template>
 
 <div class="flex flex-col items-center w-full h-full gap-4">
-    <NuxtPicture v-if="product.image" :src="`http://localhost:3000/directus/assets/${product.image.id}`"
+    <NuxtPicture v-if="product.image" :src="`directus/${product.image.id}`"
         class="max-w-60 min-w-52 max-h-48 min-h-44 rounded-lg" :alt="product.image.description"
         :width="product.image.width" :height="product.image.height" />
     <NuxtImg v-else

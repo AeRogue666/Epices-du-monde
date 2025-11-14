@@ -49,7 +49,7 @@ const emit = defineEmits<{
         <h1 class="text-5xl font-semibold">{{ product.title }}</h1>
         <section class="flex flex-col items-center w-full h-auto gap-6">
             <NuxtPicture v-for="(img, i) of product.image" legacy-format="image"
-                :src="`http://localhost:3000/directus/assets/${img.id}`"
+                :src="`directus/${img.id}`"
                 :img-attrs="{ id: img.id, class: 'rounded-xl' }" :alt="img.description" :key="i + img.id" />
             <ProductOrganismsProductInfosModalOrganism :product="product" :cart-number="cartNumber"
                 v-model="productNumber" @change="updateProductsNumber" />

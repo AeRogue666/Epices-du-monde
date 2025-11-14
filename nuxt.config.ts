@@ -56,4 +56,10 @@ export default defineNuxtConfig({
     },
     baseURL: "/",
   },
+  image: {
+    domains: ['localhost:3000/directus/assets'],
+    alias: {
+      directus: 'http://localhost:3000/directus/assets'
+    }
+  }
 });
