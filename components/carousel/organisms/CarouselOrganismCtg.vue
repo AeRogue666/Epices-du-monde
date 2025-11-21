@@ -96,12 +96,12 @@ const categories = reactive<{
             container: 'transition-[height]',
             controls: '',
             dots: '',
-            dot: 'w-6 h-1',
+            dot: 'w-6 h-3',
             item: 'xl:basis-1/3',
         }" :prev-icon="'fa6-solid:chevron-left'" :next-icon="'fa6-solid:chevron-right'"
             class="w-full max-w-xs xl:max-w-6xl mx-auto z-1">
             <a :href="item.link"
-                class="flex flex-col items-center w-[18rem] h-[10rem] p-4 text-(--silver) cursor-pointer rounded-xl"
+                class="flex flex-col items-center w-[18rem] h-40 p-4 text-(--silver) cursor-pointer rounded-xl"
                 :style="`background-color: ${item.img.color}`">
                 <UIcon :name="item.img.icon" width="234" height="234" class="w-18 h-18" />
                 <span class="w-full h-auto text-base text-center font-semibold p-4">{{ item.label }}</span>

@@ -59,8 +59,8 @@ const productNumber = ref<number>(1),
             height?: number,
         },
         tags?: [],
-        allergies?: [],
-        nutrition?: [],
+        allergies?: Allergie[],
+        nutrition?: Nutrition[],
         labels?: Label[],
     }[]>([]);
 
@@ -70,6 +70,17 @@ const { data: product } = await useAsyncData(`Product:${id}`, () => {
     { data: img } = await useAsyncData('Image', () =>
         $fetch(`${apiPublicEndpoint}/files?filter[id][_eq]=${product.value?.image_id}&fields=id,description,width,height`)
     ),
+    { data: nutrition } = await useAsyncData('Nutrition', () => 
+        $fetch(`${apiPublicEndpoint}/items/Nutrition?filter[Product_id][_eq]=${id}&fields=id,energie_kj,energie_kcal,matieres_grasses,acide_gras_satures,glucides,sucres,proteines,sel,edulcorants,fibres`)
+    ),
+    productIcon = await fetch(`${apiPublicEndpoint}/items/Product_Icon?filter[Product_id][_eq]=${id}`).then(res => res.json()).then(res => res.data),
+    { data: icon, status, error } = await useAsyncData('Icon', async () => {
+        return await Promise.all(
+            productLabel.map((item: { Icon_id: number; }) => $fetch(`${apiPublicEndpoint}/items/Icon?filter[id][_eq]=${item.Icon_id}`)
+                .then((res: any) => res.data)
+            )
+        )
+    }),
     productLabel = await fetch(`${apiPublicEndpoint}/items/Product_Label?filter[Product_id][_eq]=${id}`).then(res => res.json()).then(res => res.data),
     { data: label, status, error } = await useAsyncData('Label', async () => {
         return await Promise.all(
@@ -80,7 +91,7 @@ const { data: product } = await useAsyncData(`Product:${id}`, () => {
     });
 
 const productAssemble = () => {
-    const type = availabilityTypeList.filter((type) => type.value === product.value?.availability)[0];
+    const type = availabilityTypeList.filter((type: { value: any; }) => type.value === product.value?.availability)[0];
     if (product.value && img.value)
         productsList.push({
             id: product.value.id,
@@ -98,6 +109,8 @@ const productAssemble = () => {
             stock: product.value.stock,
             availability: type,
             image: img.value.data,
+            icon: icon.value.data,
+            nutrition: nutrition.value.data,
             labels: label.value?.flat(1),
         })
 };
@@ -108,7 +121,8 @@ const addToCart = (nb: number) => {
 };
 
 onMounted(() => {
-    product ? img : ''
+    product ? img && nutrition : ''
+    productIcon ? icon : ''
     productLabel ? label : ''
     product && img && label ? productAssemble() : ''
     console.log('Product: ', product.value, ' ProductsList: ', productsList)

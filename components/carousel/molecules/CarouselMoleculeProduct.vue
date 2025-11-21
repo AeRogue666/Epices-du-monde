@@ -37,14 +37,14 @@
             container: 'transition-[height]',
             controls: '',
             dots: 'text-black',
-            dot: 'w-6 h-1',
+            dot: 'w-6 h-3',
             item: 'xl:basis-1/3',
         }" :prev-icon="'fa6-solid:chevron-left'" :next-icon="'fa6-solid:chevron-right'"
             class="w-md max-w-xs md:w-xl md:max-w-xl lg:w-3xl lg:max-w-3xl xl:w-6xl xl:max-w-6xl mx-auto z-1">
             <a :href="`/product/${item.id}/${item.slug}`"
                 class="flex flex-col items-center h-(calc(100% + 4px)) m-4 rounded-xl bg-(--color-bg) teaser">
                 <img v-if="item.image_id"
-                    class="w-[100% + 2px] h-[100% + 2px] max-w-[15rem] min-h-[11.25rem] rounded-t-xl"
+                    class="w-[100% + 2px] h-[100% + 2px] max-w-60 min-h-45 rounded-t-xl"
                     :src="`/directus/assets/${item.image_id.id}`" :alt="item.image_id.description"
                     :width="item.image_id.width" :height="item.image_id.height">
                 <h3 class="w-full h-auto text-3xl text-center font-semibold p-4">{{ item.title }}</h3>

@@ -38,8 +38,8 @@ useSeoMeta({
 */
 
 onMounted(() => {
-  if(getStorage('cart') == undefined) {
-      saveStorage('cart', [])
+  if (getStorage('cart') == undefined) {
+    saveStorage('cart', [])
   }
 })
 
@@ -55,6 +55,10 @@ if (import.meta.client) {
 
 <template>
   <UApp>
+
+    <Head>
+      <Meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    </Head>
     <NuxtLayout>
       <TheHeader />
 

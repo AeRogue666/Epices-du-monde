@@ -1,12 +1,13 @@
 <script setup lang="ts">
+import { UTable } from '#components';
 import { capitalize } from 'vue';
 
 defineProps<{
     title: string;
     description?: any;
     ingredients?: string;
-    allergies?: any;
-    nutrition?: any;
+    allergies?: Allergie[];
+    nutrition?: Nutrition[];
     brand?: string;
     origin?: string;
     tags?: any;
@@ -33,7 +34,7 @@ defineProps<{
                 </div>
                 <div v-if="nutrition" class="flex flex-col items-baseline">
                     <span>{{ capitalize($t('main.product.collapsible.nutrition')) }}:</span>
-                    <div>{{ nutrition }}</div>
+                    <UTable :data="nutrition" />
                 </div>
                 <span v-if="brand">{{ capitalize($t('main.product.collapsible.brand')) }}: {{ brand }}</span>
                 <span v-if="origin">{{ capitalize($t('main.product.collapsible.origin')) }}: {{ origin }}</span>

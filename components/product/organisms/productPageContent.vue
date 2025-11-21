@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { UIcon } from '#components';
 import { capitalize } from 'vue';
 
 defineProps<{
@@ -27,9 +28,13 @@ defineProps<{
             width?: number,
             height?: number,
         },
+        icon: {
+            id: string,
+            description: string,
+        },
         tags?: [],
-        allergies?: [],
-        nutrition?: [],
+        allergies?: Allergie[],
+        nutrition?: Nutrition[],
         labels?: Label[],
     }>,
     cartNumber: number,
@@ -55,6 +60,7 @@ const emit = defineEmits<{
                     class="object-cover object-top w-full h-full rounded-lg" legacy-format="image"
                     :img-attrs="{ id: image?.id, class: 'rounded-xl' }" :alt="image?.description" :width="image?.width"
                     :height="image?.height" :key="i" />
+                <UIcon v-for="(icon, i) of product.icon" :name="icon.id" role="img" :aria-label="icon.description" focusable="false" class="size-5" :key="i" />
             </div>
             <UContainer class="flex flex-col items-baseline my-3">
                 <UContainer class="flex flex-col items-baseline">
