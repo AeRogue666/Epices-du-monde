@@ -2,6 +2,7 @@
 import TheHeader from './layouts/TheHeader.vue';
 import TheFooter from './layouts/TheFooter.vue';
 import { getStorage, saveStorage } from './assets/ts/storageFunctions';
+import { capitalize } from 'vue';
 
 useHeadSafe({
   link: [
@@ -25,7 +26,7 @@ useSeoMeta({
   twitterDescription: 'Commandez en ligne vos produits asiatiques et exotiques : sauces, épices, riz, thés… sur epices-du-monde.com. Boutique ouverte en ville et expédition rapide.',
   twitterImage: '',
   twitterSite: '@epices-du-monde.com',
-  googleSiteVerification: 'KW-vaMpUJqCPV9bqy54jn_cMkWti7eiInTwIwYhtJ88',
+  googleSiteVerification: '', // KW-vaMpUJqCPV9bqy54jn_cMkWti7eiInTwIwYhtJ88
 });
 /*
 <NuxtImg src="/img/logo.png" alt="Image of the logo of Epices du Monde" width="400" height="400"
@@ -68,7 +69,7 @@ if (import.meta.client) {
       </main>
       <TheFooter>
         <template #down>
-          <span class="text-base">© 2009-{{ new Date().getFullYear() }} Epices Du Monde. Tous droits réservés.</span>
+          <span class="text-base">© 2009-{{ new Date().getFullYear() }} Epices Du Monde. {{ capitalize($t('footer.copyright')) }}</span>
           <span class="text-base">Epices Du Monde - 4 chemin du moulon - 07200 Aubenas</span>
           <span class="text-base">Siret : 82402921900014</span>
         </template>
