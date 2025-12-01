@@ -171,7 +171,7 @@ const { data: productData, status: productStatus, error: productError } = await 
 const products = await $directus.request(readItems('Product', {
     page: pages.value,
     limit: productLimit.value,
-    fields: ['id','status','title','description','slug','price','price_per_kg','old_price','availability','image_id','Product_Categorie','product_label']
+    fields: ['id','status','title','description','slug','price','price_per_kg','old_price','availability','image_id','Product_Categorie','Product_Label']
 }))
 .then(async (res: any[]) => {
     // map and get image_id

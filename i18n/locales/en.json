@@ -40,6 +40,21 @@
         "brand": "brand",
         "origin": "origin",
         "tag": "tags"
+      },
+      "nutrition": {
+        "title": "medium nutritional values of 100g of product",
+        "energy": "energy",
+        "fat": "fat",
+        "satured_fat": "satured fat",
+        "glucides": "glucides",
+        "sugar": "sugar",
+        "fiber": "fiber",
+        "proteine": "proteines",
+        "salt": "salt",
+        "edulcorant": "edulcorants",
+        "per_100g": "per 100g",
+        "per_30g": "per part (30g)",
+        "rnj": "% Ref Int"
       }
     }
   },

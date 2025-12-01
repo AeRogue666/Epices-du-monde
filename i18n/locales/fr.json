@@ -40,6 +40,21 @@
         "brand": "marque",
         "origin": "origine",
         "tag": "tags"
+      },
+      "nutrition": {
+        "title": "valeurs nutritionnelles moyennes pour 100g de produit",
+        "energy": "energie",
+        "fat": "matières grasses",
+        "satured_fat": "dont acides gras saturés",
+        "glucides": "glucides",
+        "sugar": "dont sucres",
+        "fiber": "fibres",
+        "proteine": "protéines",
+        "salt": "sel",
+        "edulcorant": "edulcorants",
+        "per_100g": "pour 100g",
+        "per_30g": "par portion (30g)",
+        "rnj": "% AR"
       }
     }
   },
