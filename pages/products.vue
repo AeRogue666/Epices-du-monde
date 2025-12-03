@@ -127,7 +127,8 @@ const productSkeletonLength = ref<number>(6),
     itemsPerPage = ref<number>(18),
     pages = ref<number>(1 | productsList.length / itemsPerPage.value),
     productLimit = ref<number>(15),
-    filterQuery = reactive(['[status][_eq]=published']);
+    filterQuery = reactive(['[status][_eq]=published']),
+    productsLength = ref<number>(0);
 
 // Functions for without and with queries
 const updateTagsList = (v: number) => {
@@ -158,17 +159,21 @@ const updateTagsList = (v: number) => {
     };
 
 // Without queries
-const productsDataList = reactive<Product[]>([]);
 
-const { data: productData, status: productStatus, error: productError } = await useAsyncData('Product', async () => {
-    return $fetch(`${apiPublicEndpoint}/items/Product?filter[status][_eq]=published&sort=date_created&page=1`).then((res: any) => res.data)
+/* const { data: productData, status: productStatus, error: productError } = await useAsyncData('Product', async () => {
+    // return $fetch(`${apiPublicEndpoint}/items/Product?filter[status][_eq]=published&sort=date_created&page=1`).then((res: any) => res.data)
+    return $directus.request(readItems('Product', {
+        page: pages.value,
+        limit: productLimit.value,
+        fields: ['id', 'status', 'title', 'description', 'slug', 'price', 'price_per_kg', 'old_price', 'availability', 'image_id', 'Product_Categorie', 'Product_Label']
+    }))
 }, {
     getCachedData(key, nuxtApp) {
         return nuxtApp.payload.data[key] || nuxtApp.static.data[key] || null;
     }
-});
+}); */
 
-const products = await $directus.request(readItems('Product', {
+/* const products = await $directus.request(readItems('Product', {
     page: pages.value,
     limit: productLimit.value,
     fields: ['id','status','title','description','slug','price','price_per_kg','old_price','availability','image_id','Product_Categorie','Product_Label']
@@ -181,13 +186,13 @@ const products = await $directus.request(readItems('Product', {
             image_id: await $fetch(`${apiPublicEndpoint}/files?filter[id][_eq]=${item.image_id}&fields=id,description,width,height`).then((res: any) => res.data)
         }
     })
-
+ 
     return await Promise.all(
         res.map(async (item: any) => {
             return await $fetch(`${apiPublicEndpoint}/files?filter[id][_eq]=${item.image_id}&fields=id,description,width,height`).then((res: any) => res.data)
         })
     )
-
+ 
     return res.map((item: any) => {
         return {
             ...item,
@@ -196,8 +201,7 @@ const products = await $directus.request(readItems('Product', {
             },
         }
     })
-})
-
+}); */
 /* const { data: imageData, status: imageStatus, error: imageError }= await useAsyncData('Image', async () => {
     await Promise.all(
         productsDataList.map(async (item) => {
@@ -259,7 +263,8 @@ const readCategoriesByQueries = async () => {
     categories ? products : ''
     products.length !== 0 ? readImage : ''
     products && image ? productsAssemble(products, image) : ''
-};
+},
+ { data: productData, error: productError, execute, refresh, clear } = await useFetch(`${apiPublicEndpoint}/items/Product?filter[status][_eq]=published&sort=date_created`);
 
 onMounted(() => {
     if (query.categories) {
@@ -269,14 +274,28 @@ onMounted(() => {
     } else {
         readAllProducts();
         readAllCategories();
-        productData.value ? productsDataList.push(productData.value) : ''
+        // productData.value ? productsDataList.push(productData.value) : ''
         // productData.value && image ? productsAssemble(productData.value, image) : ''
+        // products ? productsLength.value = products.length : ''
+        // console.log(products)
+        productsList ? productsLength.value = productsList.length : ''
+        console.log(productsList)
 
-        console.log(products)
+        console.log(productData.value, productError.value)
     }
 });
+
 watch(useRoute(), (newRoute) => {
-    // console.log(newRoute.query.categories)
+    console.log(newRoute.query)
+    if (newRoute.query.categories || newRoute.query.search) {
+        productsList.splice(productsList.length, 1);
+        readAllProducts();
+        readAllCategories();
+        // products ? productsLength.value = products.length : ''
+        // console.log('Updated content: ', products)
+        productsList ? productsLength.value = productsList.length : ''
+        console.log(productsList)
+    }
 });
 </script>
 
@@ -289,7 +308,7 @@ watch(useRoute(), (newRoute) => {
                     <ProductsFilterModal :tags-list="categoriesList" />
                     <div class="flex flex-col items-start gap-4 xl:flex-row xl:items-center">
                         <span class="text-base">Products:
-                            <span class="font-semibold">{{ productsDataList.length }}</span>
+                            <span class="font-semibold">{{ productsLength }}</span>
                         </span>
                     </div>
                 </div>
@@ -309,9 +328,9 @@ watch(useRoute(), (newRoute) => {
                         <ProductsItem :product="item" />
                     </li>
                 </ul> -->
-                <UEmpty v-else-if="!productsList && productStatus == 'success'"
+                <!-- <UEmpty v-else-if="!productsList && productStatus == 'success'"
                     :title="capitalize('aucun produit trouvé')"
-                    :description="capitalize(`il semble qu'aucun projet n'a été trouvé.`)" icon="fa6-solid-file" />
+                    :description="capitalize(`il semble qu'aucun projet n'a été trouvé.`)" icon="fa6-solid-file" /> -->
 
                 <ul v-else
                     class="grid grid-cols-1 items-center w-full h-auto gap-28 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
@@ -320,6 +339,9 @@ watch(useRoute(), (newRoute) => {
                     </li>
                 </ul>
             </div>
+            <span>{{ productData }}</span>
+            <button @click.prevent="() => refresh()">Refresh data</button>
+            <button @click.prevent="() => clear()">Clear data</button>
             <UPagination v-model:page="pages" :items-per-page="itemsPerPage" :sibling-count="1" show-edges show-controls
                 active-color="neutral" active-variant="solid" variant="ghost" :total="productsList.length" />
         </section>

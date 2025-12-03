@@ -20,7 +20,7 @@
 <template>
     <UDrawer :title="title" :description="description">
         <UButton color="neutral" variant="outline" size="xl" icon="fa6-solid:filter"
-            class="flex items-center w-auto h-auto min-w-[12rem] text-xl p-4 border-2 border-solid border-(--color-text) rounded-lg relative">
+            class="flex items-center w-auto h-auto min-w-48 text-xl p-4 border-2 border-solid border-(--color-text) rounded-lg relative">
             Filtrer & Trier</UButton>
 
         <template #body>
