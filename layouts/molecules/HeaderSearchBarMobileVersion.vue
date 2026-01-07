@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { capitalize } from 'vue';
-import type { LocationQueryValue } from 'vue-router';
 
-defineProps<{
-    search: string | undefined | LocationQueryValue | LocationQueryValue[]
-}>();
+const filterStore = useFilterStore();
+const search = defineModel('search', { type: String, default: '' });
+watch(search, (value) => {
+    filterStore.setSearch(value)
+})
 
 const searchProductTitle = ref<string>('chercher un produit'),
     searchProductDescription = ref<string>('ecrivez le nom du produit et laissez-nous le chercher');
@@ -13,7 +14,8 @@ const searchProductTitle = ref<string>('chercher un produit'),
 <template>
     <div class="">
         <UModal :title="capitalize(searchProductTitle)" :description="capitalize(searchProductDescription)">
-            <UButton icon="i-fa6-solid:magnifying-glass" color="neutral" variant="ghost" size="xl" class="bg-transparent text-2xl rounded-full" />
+            <UButton icon="i-fa6-solid:magnifying-glass" color="neutral" variant="ghost" size="xl"
+                class="bg-transparent text-2xl rounded-full" />
             <template #body>
                 <form action="/products" method="get">
                     <label for="searchInput" class="sr-only">{{ capitalize(searchProductTitle) }}</label>

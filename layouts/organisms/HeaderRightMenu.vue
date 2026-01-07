@@ -4,7 +4,7 @@ import HeaderSearchBarDesktopVersion from '../molecules/HeaderSearchBarDesktopVe
 import HeaderSearchBarMobileVersion from '../molecules/HeaderSearchBarMobileVersion.vue';
 import HeaderAvatarMenu from './HeaderAvatarMenu.vue';
 
-const { search } = useSearchQueryStore(),
+const { search } = useFilterStore(),
     piniaCart = usePiniaCartStore(),
     { cart, cartTotal, cartItemsCount } = storeToRefs(piniaCart),
     { isDesktop, isDesktopOrTablet, isTablet, isMobileOrTablet, isMobile } = useDevice();
@@ -15,6 +15,7 @@ const isAvatarMenuOpen = ref<boolean>(false),
 const updateAvatarMenu = () => {
     isAvatarMenuOpen.value = !isAvatarMenuOpen.value
 };
+
 /* removeCartProduct = (v: string) => {
     cartStore.removeFromShoppingCart(v)
     console.log(v);
@@ -26,15 +27,16 @@ resetCartProduct = () => {
 
 if (import.meta.client) {
     watch(usePiniaCartStore().$state, (state) => {
-        console.log(cart.value, state.availibility, state.error)
+        console.log(state.cart, state.availibility, state.cartError)
     });
+    console.log('search: ', search);
 }
 </script>
 
 <template>
     <UContainer class="flex flex-row justify-end items-end w-full px-6 gap-6">
-        <HeaderSearchBarMobileVersion v-if="isDesktop || isMobileOrTablet" :search="search" />
-        <HeaderSearchBarDesktopVersion v-if="!isDesktop" :search="search" />
+        <!-- <HeaderSearchBarMobileVersion v-if="isDesktop || isMobileOrTablet" :search="search" /> -->
+        <HeaderSearchBarDesktopVersion :search="search" />
         <!-- <LayoutsMoleculesHeaderShopIconMolecule :new-cart="newCart" :show="show" :shopping-cart="shoppingCart"
             @cart-product-id="removeCartProduct" @cart-reset="resetCartProduct" /> -->
         <HeaderPiniaShopIconMocule :items="cart" :total="cartTotal" :count="cartItemsCount" :show="show"

@@ -1,20 +1,21 @@
 <script setup lang="ts">
-    import { UDrawer } from '#components';
-    import ProductsFilterCtg from '../organisms/productsFilterCtg.vue';
+import { UDrawer } from '#components';
+import type { CategoryGroup } from '~/config/categories';
+import ProductsFilterCtg from '../organisms/productsFilterCtg.vue';
+import type { LocationQueryValue } from 'vue-router';
 
-    defineProps<{
-        tagsList: Array<{
-            id: number,
-            label: string,
-            children: Array<{
-                id: number,
-                label: string,
-                value: string,
-                checked?: boolean,
-            }>
-        }>,
-    }>();
-    const title = ref<string>('Filtrer & Trier'), description = ref<string>('Filtrer les produits');
+defineProps<{
+    categoriesList: CategoryGroup[],
+    categoriesQuery: LocationQueryValue[],
+}>();
+
+const filterStore = useFilterStore(), title = ref<string>('Filtres'), description = ref<string>('Filtrer les produits');
+
+const onSubmit = (values: string[]) => {
+    filterStore.setCategories(values)
+}, onReset = () => {
+    filterStore.clearCategories()
+};
 </script>
 
 <template>
@@ -24,7 +25,8 @@
             Filtrer & Trier</UButton>
 
         <template #body>
-            <ProductsFilterCtg :categories-list="tagsList" />
+            <ProductsFilterCtg :categories-list="categoriesList" :categories-query="categoriesQuery" @submit="onSubmit"
+                @reset="onReset" />
         </template>
     </UDrawer>
 </template>

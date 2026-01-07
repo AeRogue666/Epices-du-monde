@@ -1,107 +1,77 @@
-interface Image {
-  id: string;
-  description: string;
-  width?: number;
-  height?: number;
+interface ProductsState {
+  products: Product[];
+  loading: boolean;
+  error: string | null;
 }
 
-interface Types {
-  name: string;
-  value: string;
-  color: string;
-}
+export const useProductsStore = defineStore("Product", {
+  state: (): ProductsState => ({
+    products: [],
+    loading: false,
+    error: null,
+  }),
 
-interface Products {
-  id: number;
-  title: string;
-  description: string;
-  image: {
-    id: string;
-    description: string;
-    width?: number;
-    height?: number;
-  };
-  slug: string;
-  price: number;
-  reduction_rate?: number;
-  old_price?: number;
-  availability: {
-    name: string;
-    value: string;
-    color: string;
-  };
-}
-
-const image = reactive<Image[]>([]),
-  productsList = reactive<Products[]>([]),
-  availabilityTypeList = reactive<Types[]>([
-    {
-      name: "Available soon",
-      value: "soon",
-      color: "black",
+  getters: {
+    allProducts: (state) => state.products,
+    getProductById: (state) => (id: string) => {
+      return state.products.find((item) => item.id === id);
     },
-    {
-      name: "In stock",
-      value: "in_stock",
-      color: "green",
+    getProductBySlug: (state) => (slug: string) => {
+      return state.products.find((item) => item.slug === slug);
     },
-    {
-      name: "Out of stock",
-      value: "out_of_stock",
-      color: "red",
+    getProductsByCategory: (state) => (categoryId: number) => {
+      return state.products.filter((product) => {
+        if (Array.isArray(product.Product_Categorie)) {
+          return product.Product_Categorie.some((ctg) => {
+            return typeof ctg === "number"
+              ? ctg === categoryId
+              : ctg.id === categoryId;
+          });
+        }
+        return false;
+      });
     },
-  ]);
-
-const productsAssemble = (product: any[], image: any[]) => {
-  product.map((obj, i) => {
-    const type = availabilityTypeList.filter(
-      (type) => type.value === obj.availability
-    )[0];
-    const img = image.filter((item) => item.id === obj.image_id)[i];
-    return productsList.unshift({
-      id: obj.id,
-      title: obj.title,
-      description: obj.description,
-      image: img,
-      slug: obj.slug,
-      price: obj.price,
-      reduction_rate: obj.reduction_rate,
-      old_price: obj.old_price,
-      availability: type,
-    });
-  });
-};
-
-const readAllProducts = async () => {
-  const products = await fetch(
-      `http://localhost:3000/directus/items/Product?filter[status][_eq]=published&sort=date_created`
-    )
-      .then((res) => res.json())
-      .then((res) => res.data),
-    readImage = await Promise.all(
-      products.map(async (item: { image_id: string }) => {
-        await fetch(
-          `http://localhost:3000/directus/files?filter[id][_eq]=${item.image_id}&fields=id,description,width,height`
-        )
-          .then((res) => res.json())
-          .then((res) => res.data)
-          .then((res) =>
-            image.push(res.reduce((acc: any, value: any) => acc + value))
-          );
-      })
-    );
-
-  products ? readImage : "";
-  products && image ? productsAssemble(products, image) : "";
-};
-
-export const useProductsStore = defineStore("products", () => {
-  const products = computed({
-    get() {
-      readAllProducts();
+    productsOnSale: (state) => {
+      return state.products.filter(
+        (item) => item.reduction_rate && item.reduction_rate > 0
+      );
     },
-    set() {},
-  });
+    productsInStock: (state) => {
+      return state.products.filter(
+        (item) => item.stock > 0 && item.availability === "available"
+      );
+    },
+    totalProducts: (state) => state.products.length,
+  },
 
-  return { products };
+  actions: {
+    setProducts(products: Product[]) {
+      this.products = products;
+      this.loading = false;
+      this.error = null;
+    },
+    addProduct(product: Product) {
+      this.products.push(product);
+    },
+    updateProduct(id: string, updates: Partial<Product>) {
+      const index = this.products.findIndex((item) => item.id === id);
+      if (index !== -1) {
+        this.products[index] = { ...this.products[index], ...updates };
+      }
+    },
+    removeProduct(id: string) {
+      this.products = this.products.filter((item) => item.id !== id);
+    },
+    setLoading(loading: boolean) {
+      this.loading = loading;
+    },
+    setError(error: string | null) {
+      (this.error = error), (this.loading = false);
+    },
+    reset() {
+      this.products = [];
+      this.loading = false;
+      this.error = null;
+    },
+  },
 });
