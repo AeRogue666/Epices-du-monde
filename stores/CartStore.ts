@@ -1,211 +1,114 @@
-import { getStorage, saveStorage } from "~/assets/ts/storageFunctions";
-
-interface Cart {
-  id: string;
-  title: string;
-  description: string;
-  image: Image;
-  slug: string;
-  poids_net: number;
-  price: number;
-  price_per_kg?: number;
-  reduction_rate?: number;
-  old_price?: number;
-  stock: number;
-  availability?: Availability;
-  product_number: number;
+interface CartItem {
+  productId: string;
+  quantity: number;
 }
 
-interface AvailabilityList {
-  name: string;
-  value: string;
-  color: string;
-}
+// Cart store
+export const useCartStore = defineStore("cart", () => {
+  const cartCookie = useCookie<CartItem[]>("cart", {
+      default: () => [],
+      sameSite: "lax",
+    }),
+    cart = ref<CartItem[]>(cartCookie.value),
+    cartError = ref<string | null>(null),
+    isLoaded = ref(false);
 
-interface Availability {
-  name: string;
-  value: string;
-  color: string;
-}
+  // Persistence
+  /* const loadCart = () => {
+    if (isLoaded.value) return;
 
-interface Error {
-  code: number;
-  msg: string;
-  color: "error" | "primary" | "secondary" | "success" | "info" | "warning" | "neutral" | undefined;
-}
+    try {
+      const stored = getStorage("cart");
+      cart.value = stored ? JSON.parse(stored) : [];
+    } catch (error) {
+      cart.value = [];
+      cartError.value = "Cart loading failed";
+    } finally {
+      isLoaded.value = true;
+    }
+  }; */ // Not needed anymore with useCookie()
 
-const availabilityList = reactive<AvailabilityList[]>([
-  {
-    name: "Available soon",
-    value: "soon",
-    color: "black",
-  },
-  {
-    name: "In stock",
-    value: "in_stock",
-    color: "green",
-  },
-  {
-    name: "Out of stock",
-    value: "out_of_stock",
-    color: "red",
-  },
-]);
-
-export const usePiniaCartStore = defineStore("pinia-cart", {
-  state: () => ({
-    cart: reactive<Cart[]>([]),
-    availibility: ref<Availability>(),
-    cartError: ref<Error>({ code: 0, msg: "", color: undefined }),
-  }),
-  getters: {
-    loadCartFromLocalStorage() {
-      this.cart = getStorage("cart");
-      console.log(this.cart);
+  watch(
+    cart,
+    (value) => {
+      cartCookie.value = value; // saveStorage("cart", JSON.stringify(value));
     },
-    saveCartToLocalStorage() {
-      saveStorage("cart", this.cart);
-    },
-    cartTotal(): Array<Cart> {
-      return this.cart.reduce(
-        (total: any, item: { price: number }) => total + item.price,
-        0
-      );
-    },
-    cartItemsCount(): number {
-      return this.cart.length;
-    },
-  },
-  actions: {
-    async addItem(id: string, nb: number) {
-      const toast = useToast(),
-        fetchProduct = async (id: string, number: number) => {
-          const product = await fetch(
-              `http://localhost:3000/directus/items/Product?filter[id][_eq]=${id}&filter[status][_eq]=published&sort=date_created`
-            )
-              .then((res) => res.json())
-              .then((res) => res.data)
-              .then((res) => res.reduce((acc: any, value: any) => acc + value)),
-            img = await fetch(
-              `http://localhost:3000/directus/files?filter[id][_eq]=${product?.image_id}&fields=id,description,width,height`
-            )
-              .then((res) => res.json())
-              .then((res) => res.data)
-              .then((res) => res.reduce((acc: any, value: any) => acc + value));
+    { deep: true }
+  );
 
-          if (product) img;
-          if (product && img) {
-            this.availibility = availabilityList.filter(
-              (item) => item.value == product.availability
-            )[0];
+  // Getters
+  const totalItems = computed(() =>
+    cart.value.reduce((sum, item) => sum + item.quantity, 0)
+  );
 
-            if (product.stock > 0 && this.availibility?.value === "in_stock") {
-              this.cart.push({
-                id: product.id,
-                title: product.title,
-                description: product.description,
-                slug: product.slug,
-                poids_net: product.poids_net,
-                price: product.price,
-                price_per_kg: product.price_per_kg,
-                reduction_rate: product.reduction_rate,
-                old_price: product.old_price,
-                stock: product.stock,
-                availability: this.availibility,
-                image: img,
-                product_number: number,
-              }),
-                this.saveCartToLocalStorage;
-              (this.cartError.code = 200), (this.cartError.msg = "Product added to cart"), this.cartError.color = 'success';
-              // toaster(this.cartError.code, this.cartError.msg, 'success');
-            } else {
-              this.cartError.code = 500, this.cartError.msg = `Product ${product.title} can not be added to cart`, this.cartError.color = 'error';
-              // toaster(this.cartError.code, this.cartError.msg, 'error');
-            }
-          }
-        },
-        toaster = (code: number, msg: string, color: "error" | "primary" | "secondary" | "success" | "info" | "warning" | "neutral" | undefined) => {
-          toast.add({
-          title: msg,
-          description: `Code: ${code}`,
-          color: color,
-        })
-        };
-      if (this.cart.length !== 0) {
-        const isValueExist = this.cart.findIndex((item) => item.id == id);
-        if (isValueExist > -1) {
-          this.cartError.code = 400, this.cartError.msg = "Product already in cart", this.cartError.color = 'warning';
-          // toaster(this.cartError.code, this.cartError.msg, 'warning');
-        } else {
-          fetchProduct(id, nb);
-        }
+  const isInCart = (productId: string): ComputedRef<boolean> => {
+    return computed(() => cart.value.some((i) => i.productId === productId));
+  };
+
+  const getItem = (productId: string): ComputedRef<CartItem | null> => {
+    return computed(
+      () => cart.value.find((i) => i.productId === productId) || null
+    );
+  };
+
+  const isQuantityAvailable = (
+    productId: string,
+    stock: number
+  ): ComputedRef<boolean> => {
+    return computed(() => {
+      const item = cart.value.find((i) => i.productId === productId);
+      return !item || item.quantity < stock;
+    });
+  };
+
+  // Actions
+  const lastAction = ref<"add" | "remove" | null>(null),
+    lastRemoved = ref<CartItem | null>(null);
+
+  const addItem = (productId: string, quantity = 1, stock: number) => {
+      const item = cart.value.find((i) => i.productId === productId);
+
+      if (item) {
+        item.quantity = Math.min(item.quantity + quantity, stock);
       } else {
-        fetchProduct(id, nb);
+        cart.value.push({
+          productId,
+          quantity: Math.min(quantity, stock),
+        });
+      }
+
+      lastAction.value = "add";
+    },
+    removeItem = (productId: string) => {
+      const index = cart.value.findIndex((i) => i.productId === productId);
+      if (index !== -1) {
+        lastRemoved.value = cart.value[index];
+        cart.value.splice(index, 1);
+      }
+      // cart.value = cart.value.filter((i) => i.productId !== productId);
+    },
+    undoRemove = () => {
+      if (lastRemoved.value) {
+        cart.value.push(lastRemoved.value);
+        lastRemoved.value = null;
       }
     },
-    removeItem(id: string) {
-      this.cart = this.cart.filter((item: { id: string }) => item.id !== id);
-      this.saveCartToLocalStorage;
-    },
-    clearCart() {
-      this.cart = this.cart.splice(0, this.cart.length);
-      this.saveCartToLocalStorage;
-    },
-  },
-});
+    clearCart = () => {
+      cart.value = [];
+    };
 
-/* interface Image {
-  id: string;
-  description: string;
-  width?: number;
-  height?: number;
-} */
-
-/* export const usePiniaCartStore = defineStore("pinia-cart", {
-  state: () => ({
-    items: reactive<
-      {
-        id: string;
-        title: string;
-        image: {
-          id: string;
-          description: string;
-          width?: number;
-          height?: number;
-        };
-        slug: string;
-        poids_net: number;
-        price: number;
-        price_per_kg?: number;
-        reduction_rate?: number;
-        old_price?: number;
-        stock: number;
-        availability: string;
-        product_number: number;
-      }[]
-    >([]),
-  }),
-  getters: {
-    cartTotal() {
-      return this.items.reduce(
-        (total: any, item: { price: number }) => total + item.price,
-        0
-      );
-    },
-    cartItemsCount() {
-      return this.items.length;
-    },
-  },
-  actions: {
-    addItem(item: any) {
-      this.items.push(item);
-    },
-    removeItem(id: string) {
-      this.items = this.items.filter((item: { id: string }) => item.id !== id);
-    },
-    clearCart() {
-      this.items = [];
-    },
-  },
+  return {
+    cart,
+    cartError,
+    totalItems,
+    lastAction,
+    lastRemoved,
+    isInCart,
+    getItem,
+    isQuantityAvailable,
+    addItem,
+    removeItem,
+    undoRemove,
+    clearCart,
+  };
 });
- */

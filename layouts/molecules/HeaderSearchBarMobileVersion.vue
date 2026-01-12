@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { capitalize } from 'vue';
 
-const filterStore = useFilterStore();
-const search = defineModel('search', { type: String, default: '' });
+const search = defineModel('search', { type: String, default: '' }),
+    filterStore = useFilterStore();
 watch(search, (value) => {
     filterStore.setSearch(value)
 })

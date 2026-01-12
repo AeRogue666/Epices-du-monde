@@ -2,27 +2,7 @@
 import { capitalize } from 'vue';
 
 defineProps<{
-    product: {
-        id: number,
-        title: string,
-        description: string,
-        ingredients: string,
-        slug: string,
-        origine: string,
-        marque: string,
-        poids_net?: number,
-        price: number,
-        price_per_kg: number,
-        reduction_rate?: number,
-        old_price?: number,
-        stock: number,
-        availability?: { name: string; value: string; color: string; },
-        image: object,
-        tags?: [],
-        allergies?: [],
-        nutrition?: [],
-        labels?: [],
-    },
+    product: Product,
     cartNumber: number,
 }>();
 

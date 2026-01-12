@@ -2,7 +2,7 @@
 import { capitalize } from 'vue';
 
 defineProps<{
-    nutrition: Nutrition[];
+    nutritions: Nutrition[];
 }>();
 
 const dailyEnergy = ref<number>(8400); // Energy in kJ needed per day (8400 kJ - 2000 kCal)
@@ -25,7 +25,7 @@ const dailyEnergy = ref<number>(8400); // Energy in kJ needed per day (8400 kJ -
             </tr>
             <tr class="absolute z-1 left-0 w-full h-px bg-(--ui-border-accented)"></tr>
         </thead>
-        <tbody v-for="(nutrition, i) of nutrition"
+        <tbody v-for="(nutrition, i) of nutritions"
             class="[&>tr]:data-[selectable=true]:hover:bg-elevated/50 [&>tr]:data-[selectable=true]:focus-visible:outline-primary divide-y divide-default">
             <tr v-if="nutrition.energie" class="data-[selected=true]:bg-elevated/50" :key="i">
                 <td class="w-4 border-t-0"></td>

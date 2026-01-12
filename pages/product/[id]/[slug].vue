@@ -1,142 +1,54 @@
 <script setup lang="ts">
-import Toaster from '~/layouts/atoms/Toaster.vue';
-
-const { id } = useRoute().params,
-    piniaCart = usePiniaCartStore(),
-    { cart, cartError } = storeToRefs(piniaCart),
-    { $directus, $readItem } = useNuxtApp(),
+const route = useRoute(),
+    { cart, addItem } = useCartStore(),
     config = useRuntimeConfig(),
     apiPublicEndpoint = config.public.apiBase;
 
-const cartNumber = computed(() => cart.value ? cart.value.findIndex((item) => item.id == id) : -1);
+const productId = computed(() => String(route.params.id));
 
-const productNumber = ref<number>(1),
-    availabilityTypeList = reactive<{
-        name: string,
-        value: string,
-        color: string,
-    }[]>([
-        {
-            name: 'Available soon',
-            value: 'soon',
-            color: 'black',
-        },
-        {
-            name: 'In stock',
-            value: 'in_stock',
-            color: 'green',
-        },
-        {
-            name: 'Out of stock',
-            value: 'out_of_stock',
-            color: 'red',
-        },
-    ]),
-    productsList = reactive<{
-        id: string | number,
-        title: string,
-        description: string,
-        ingredients: string,
-        slug: string,
-        origine: string,
-        marque: string,
-        poids_net?: number,
-        price: number,
-        price_per_kg: number,
-        reduction_rate?: number,
-        old_price?: number,
-        stock: number,
-        availability?: {
-            name: string,
-            value: string,
-            color: string,
-        },
-        image: {
-            id: string,
-            description: string,
-            width?: number,
-            height?: number,
-        },
-        tags?: [],
-        allergies?: Allergie[],
-        nutrition?: Nutrition[],
-        labels?: Label[],
-    }[]>([]);
+const { data: product, pending, error, refresh } = await useAsyncData(`product-${route.params.id}`, () =>
+    $fetch(`${apiPublicEndpoint}/items/Product`, {
+        params: {
+            filter: {
+                id: { _eq: route.params.id },
+                status: { _eq: 'published' }
+            },
+            fields: [
+                'id',
+                'title',
+                'description',
+                'price',
+                'old_price',
+                'reduction_rate',
+                'stock',
+                'availability',
+                'image_id',
+                'slug',
+                'ingredients',
+                'marque',
+                'origine',
+                'Product_Categorie',
+            ]
+        }
+    }).then((res: any) => res.data?.[0]),
+    { server: true }
+);
 
-const { data: product } = await useAsyncData(`Product:${id}`, () => {
-    return $directus.request($readItem('Product', `${id}`))
-}),
-    { data: img } = await useAsyncData('Image', () =>
-        $fetch(`${apiPublicEndpoint}/files?filter[id][_eq]=${product.value?.image_id}&fields=id,description,width,height`)
-    ),
-    { data: nutrition } = await useAsyncData('Nutrition', () => {
-        return $directus.request($readItem('Nutrition', `?filter[product_id][_eq]=${id}`)) // $fetch(`${apiPublicEndpoint}/items/Nutrition?filter[product_id][_eq]=${id}`) // &fields=id,energie,matieres_grasses,acide_gras_satures,glucides,sucres,fibres,proteines,sel,edulcorants
-    }),
-    productLabel = await fetch(`${apiPublicEndpoint}/items/Product_Label?filter[Product_id][_eq]=${id}`).then(res => res.json()).then(res => res.data),
-    { data: label, status, error } = await useAsyncData('Label', async () => {
-        return await Promise.all(
-            productLabel.map((item: { Label_id: number; }) => $fetch(`${apiPublicEndpoint}/items/Label?filter[id][_eq]=${item.Label_id}`)
-                .then((res: any) => res.data)
-            )
-        )
-    });
-    /* productIcon = await fetch(`${apiPublicEndpoint}/items/Product_Icon?filter[Product_id][_eq]=${id}`).then(res => res.json()).then(res => res.data),
-    { data: icon, iconStatus: status, iconError: error } = await useAsyncData('Icon', async () => {
-        return await Promise.all(
-            productLabel.map((item: { Icon_id: number; }) => $fetch(`${apiPublicEndpoint}/items/Icon?filter[id][_eq]=${item.Icon_id}`)
-                .then((res: any) => res.data)
-            )
-        )
-    }), */
-
-const productAssemble = () => {
-    const type = availabilityTypeList.filter((type: { value: any; }) => type.value === product.value?.availability)[0];
-    if (product.value && img.value)
-        productsList.push({
-            id: product.value.id,
-            title: product.value.title,
-            description: product.value.description,
-            ingredients: product.value.ingredients,
-            slug: product.value.slug,
-            origine: product.value.origine,
-            marque: product.value.marque,
-            poids_net: product.value.poids_net,
-            price: product.value.price,
-            price_per_kg: product.value.price_per_kg,
-            reduction_rate: product.value.reduction_rate,
-            old_price: product.value.old_price,
-            stock: product.value.stock,
-            availability: type,
-            image: img.value.data,
-            nutrition: nutrition.value,
-            labels: label.value?.flat(1),
-        })
+const addToCart = async (nb: number) => {
+    addItem(productId.value, nb, product.value!.stock);
 };
-
-const addToCart = (nb: number) => {
-    piniaCart.addItem(JSON.stringify(id), nb);
-    console.log(cart.value)
-};
-
-onMounted(() => {
-    product ? img && nutrition : ''
-    productLabel ? label : ''
-    product && img && label && nutrition ? productAssemble() : ''
-    console.log('Product: ', product.value, ' ProductsList: ', productsList)
-    console.log('productLabel: ', productLabel.value, ' Label: ', label.value?.flat(1), ' Status: ', status.value, ' Error: ', error.value);
-    console.log('Nutrition: ', nutrition.value)
-})
-
-if (import.meta.client) {
-    usePiniaCartStore().loadCartFromLocalStorage
-}
 </script>
 
 <template>
-    <ProductUiProductSkeleton v-if="productsList.length == 0" />
-    <ProductOrganismsProductPageContent v-else :products-list="productsList" :cart-number="cartNumber"
-        v-model="productNumber" @change-products-number="addToCart" />
-    <Toaster v-if="error" :event="cartError" />
-    <!-- <ProductContainerOrganism v-else :products-list="productsList" :cart-number="cartNumber" v-model="productNumber"
-        @change-products-number="addToCart" /> -->
+    <!-- Loading state -->
+    <ProductUiProductSkeleton v-if="pending" />
+    <!-- Product loaded -->
+    <ProductOrganismsProductPageContent v-else-if="product" :product="product" @change-products-number="addToCart" />
+    <!-- Error state -->
+    <!-- <Toaster v-else-if="error" :event="cartError" /> -->
+    <!-- Empty state -->
+    <div v-else>
+        <p>Aucun produit ne correspond à vos critères de recherche.</p>
+        <UButton @click.prevent="refresh()" color="neutral" variant="outline">Refresh</UButton>
+    </div>
 </template>

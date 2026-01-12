@@ -5,42 +5,32 @@ import HeaderSearchBarMobileVersion from '../molecules/HeaderSearchBarMobileVers
 import HeaderAvatarMenu from './HeaderAvatarMenu.vue';
 
 const { search } = useFilterStore(),
-    piniaCart = usePiniaCartStore(),
-    { cart, cartTotal, cartItemsCount } = storeToRefs(piniaCart),
     { isDesktop, isDesktopOrTablet, isTablet, isMobileOrTablet, isMobile } = useDevice();
 
-const isAvatarMenuOpen = ref<boolean>(false),
-    show = computed(() => cart.value.length !== 0);
+const { cart, cartError } = useCartStore();
+
+
+const isAvatarMenuOpen = ref<boolean>(false);
 
 const updateAvatarMenu = () => {
     isAvatarMenuOpen.value = !isAvatarMenuOpen.value
 };
 
-/* removeCartProduct = (v: string) => {
-    cartStore.removeFromShoppingCart(v)
-    console.log(v);
-},
-resetCartProduct = () => {
-    cartStore.resetShoppingCart
-    console.log(shoppingCart)
-}; */
-
 if (import.meta.client) {
-    watch(usePiniaCartStore().$state, (state) => {
-        console.log(state.cart, state.availibility, state.cartError)
-    });
     console.log('search: ', search);
+    console.log('cart product: ', cart[0]?.productId)
 }
+
+watch(() => cart, (newCart) => {
+    console.log('Cart updated', newCart);
+}, { deep: true });
 </script>
 
 <template>
     <UContainer class="flex flex-row justify-end items-end w-full px-6 gap-6">
-        <!-- <HeaderSearchBarMobileVersion v-if="isDesktop || isMobileOrTablet" :search="search" /> -->
-        <HeaderSearchBarDesktopVersion :search="search" />
-        <!-- <LayoutsMoleculesHeaderShopIconMolecule :new-cart="newCart" :show="show" :shopping-cart="shoppingCart"
-            @cart-product-id="removeCartProduct" @cart-reset="resetCartProduct" /> -->
-        <HeaderPiniaShopIconMocule :items="cart" :total="cartTotal" :count="cartItemsCount" :show="show"
-            @cart-reset="piniaCart.clearCart" @product-id="piniaCart.removeItem" />
+        <HeaderSearchBarMobileVersion v-if="isDesktop || isMobileOrTablet" :search="search" />
+        <HeaderSearchBarDesktopVersion v-else :search="search" />
+        <HeaderPiniaShopIconMocule :error="cartError" />
         <UAvatar icon="fa6-solid:circle-user" class="text-4xl" size="xl" @click.prevent="updateAvatarMenu" />
         <HeaderAvatarMenu v-if="isAvatarMenuOpen == true" />
     </UContainer>
