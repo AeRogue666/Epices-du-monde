@@ -7,9 +7,9 @@ const route = useRoute(),
     router = useRouter();
 
 const tabs = ref<TabsItem[]>([
-    { label: 'Home', icon: 'i-fa6-solid:house', value: 'home' },
-    { label: 'Cart', icon: 'i-fa6-solid:cart-shopping', value: 'cart' },
-    { label: 'Settings', icon: 'i-fa6-solid:sliders', value: 'settings' },
+    { label: 'Home', icon: 'i-fa7-solid:house', value: 'home' },
+    { label: 'Cart', icon: 'i-fa7-solid:cart-shopping', value: 'cart' },
+    { label: 'Settings', icon: 'i-fa7-solid:sliders', value: 'settings' },
 ]),
     isSettingsMenuOpen = ref<boolean>(false);
 

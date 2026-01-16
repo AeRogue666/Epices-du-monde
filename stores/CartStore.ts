@@ -10,36 +10,23 @@ export const useCartStore = defineStore("cart", () => {
       sameSite: "lax",
     }),
     cart = ref<CartItem[]>(cartCookie.value),
-    cartError = ref<string | null>(null),
-    isLoaded = ref(false);
-
-  // Persistence
-  /* const loadCart = () => {
-    if (isLoaded.value) return;
-
-    try {
-      const stored = getStorage("cart");
-      cart.value = stored ? JSON.parse(stored) : [];
-    } catch (error) {
-      cart.value = [];
-      cartError.value = "Cart loading failed";
-    } finally {
-      isLoaded.value = true;
-    }
-  }; */ // Not needed anymore with useCookie()
+    cartError = ref<string | null>(null);
 
   watch(
     cart,
     (value) => {
-      cartCookie.value = value; // saveStorage("cart", JSON.stringify(value));
+      cartCookie.value = value;
     },
     { deep: true }
   );
 
-  // Getters
+  /* GETTERS */
   const totalItems = computed(() =>
     cart.value.reduce((sum, item) => sum + item.quantity, 0)
   );
+
+  // totalPrice will be computed using mergedCart
+  const totalPrice = ref(0);
 
   const isInCart = (productId: string): ComputedRef<boolean> => {
     return computed(() => cart.value.some((i) => i.productId === productId));
@@ -61,7 +48,7 @@ export const useCartStore = defineStore("cart", () => {
     });
   };
 
-  // Actions
+  /* ACTIONS */
   const lastAction = ref<"add" | "remove" | null>(null),
     lastRemoved = ref<CartItem | null>(null);
 
@@ -76,7 +63,6 @@ export const useCartStore = defineStore("cart", () => {
           quantity: Math.min(quantity, stock),
         });
       }
-
       lastAction.value = "add";
     },
     removeItem = (productId: string) => {
@@ -85,13 +71,17 @@ export const useCartStore = defineStore("cart", () => {
         lastRemoved.value = cart.value[index];
         cart.value.splice(index, 1);
       }
-      // cart.value = cart.value.filter((i) => i.productId !== productId);
     },
     undoRemove = () => {
       if (lastRemoved.value) {
         cart.value.push(lastRemoved.value);
         lastRemoved.value = null;
       }
+    },
+    updateQuantity = (productId: string, quantity: number, stock: number) => {
+      const item = cart.value.find((i) => i.productId === productId);
+      if (!item) return;
+      item.quantity = Math.max(1, Math.min(quantity, stock));
     },
     clearCart = () => {
       cart.value = [];
@@ -103,12 +93,14 @@ export const useCartStore = defineStore("cart", () => {
     totalItems,
     lastAction,
     lastRemoved,
+    totalPrice,
     isInCart,
     getItem,
     isQuantityAvailable,
     addItem,
     removeItem,
     undoRemove,
+    updateQuantity,
     clearCart,
   };
 });

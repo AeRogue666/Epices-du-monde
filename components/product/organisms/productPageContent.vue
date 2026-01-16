@@ -22,10 +22,8 @@ const productNumber = defineModel({ default: 1 }),
     isProductInCart = cartStore.isInCart(props.product.id);
 
 // Computed for accessibility
-const imageAlt = computed(() => {
-    const description = getImageDescription(props.product.image_id);
-    return description || props.product.title
-}), imageDimensions = computed(() => getImageDimensions(props.product.image_id));
+const imageAlt = computed(() => { return getImageDescription(props.product.image_id) || props.product.title }),
+    imageDimensions = computed(() => getImageDimensions(props.product.image_id));
 
 const updateProductsNumber = (nb: number) => {
     emit('changeProductsNumber', nb)
@@ -35,18 +33,19 @@ const updateProductsNumber = (nb: number) => {
 <template>
     <article
         class="relative group/blog-post rounded-lg overflow-hidden flex flex-col w-full h-auto mt-3 bg-default gap-2">
-        <UContainer class="flex flex-col lg:flex-row">
-            <div class="relative overflow-hidden w-full pointer-events-none">
+        <UContainer class="flex flex-col lg:flex-row pt-4">
+            <div class="relative overflow-hidden w-full pointer-events-none aspect-video rounded-lg">
                 <NuxtPicture :src="getImageUrl(product.image_id, {
-                    width: 400, height: 400, fit: 'cover', format: 'webp', quality: 90
-                }) || `directus/${product.image_id}`" class="object-cover object-top w-full h-full rounded-lg"
-                    :alt="imageAlt" :width="imageDimensions.width || 400" :height="imageDimensions.height || 400"
-                    loading="lazy" decoding="async" fetchpriority="low" />
+                    width: 800, height: 450, fit: 'cover', format: 'webp', quality: 90
+                }) || `directus/${product.image_id}`" class="object-cover object-top w-full h-full" :alt="imageAlt"
+                    :width="imageDimensions.width || 800" :height="imageDimensions.height || 450" loading="lazy"
+                    decoding="async" fetchpriority="low" />
             </div>
             <UContainer class="flex flex-col items-baseline my-3">
                 <UContainer class="flex flex-col items-baseline">
                     <div class="flex items-baseline w-full">
-                        <h1 class="text-2xl text-pretty font-semibold text-highlighted">{{ capitalize(product.title) }}
+                        <h1 class="text-2xl text-pretty font-semibold text-highlighted">
+                            {{ capitalize(product.title) }}
                         </h1>
                     </div>
                     <div class="flex flex-row justify-between items-center w-full my-3">
@@ -58,8 +57,8 @@ const updateProductsNumber = (nb: number) => {
                             <span class="text-sm line-through h-7">{{ product.old_price }} €</span>
                         </div>
                         <div class="flex flex-col items-baseline w-auto">
-                            <div class="flex flex-row items-center w-auto gap-4">
-                                <LazyUIcon name="fa6-solid:circle" :style="`color: ${(
+                            <!-- <div class="flex flex-row items-center w-auto gap-4">
+                                <LazyUIcon name="fa7-solid:circle" :style="`color: ${(
                                     product.stock > 0 && product.availability == 'in_stock') || product.availability == 'not_available'
                                     ? (product.stock > 0 && product.availability == 'in_stock')
                                         ? 'green'
@@ -72,7 +71,7 @@ const updateProductsNumber = (nb: number) => {
                                             ? `${capitalize($t('main.product.availability.not_available'))}`
                                             : `${capitalize($t('main.product.availability.out_of_stock'))}`
                                 }}</span>
-                            </div>
+                            </div> -->
                         </div>
                     </div>
                     <div class="flex flex-row items-center">

@@ -6,8 +6,6 @@ import HeaderMobileMenuMolecule from './molecules/HeaderMobileMenuMolecule.vue';
 import { capitalize } from 'vue';
 import { headerCategoryGroups } from '~/config/headerCategories';
 
-const { isDesktop, isMobile } = useDevice();
-
 const itemsCategories = computed<NavigationMenuItem[]>(() => headerCategoryGroups)
 </script>
 
@@ -26,7 +24,7 @@ const itemsCategories = computed<NavigationMenuItem[]>(() => headerCategoryGroup
         </UContainer>
 
         <UContainer name="right" class="flex items-center justify-end lg:flex-1 gap-1.5">
-            <HeaderRightMenu v-show="isDesktop" />
+            <HeaderRightMenu />
         </UContainer>
     </header>
 </template>

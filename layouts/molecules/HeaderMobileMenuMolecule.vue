@@ -13,7 +13,7 @@ defineProps<{
         <UButton variant="ghost" color="neutral" icon="fa6-solid:bars" aria-label="Open menu" />
         <template #content>
             <div id="mobile-menu"
-                class="block w-full lg:w-auto min-w-[15rem] h-auto max-h-screen bg-(--color-bg) lg:border-solid lg:border-r-2 border-b-2 border-gray-300 lg:rounded-r-xl basis-0.5 absolute top-[101%] left-0 overflow-hidden overflow-y-scroll z-50 [&::-webkit-scrollbar]:bg-transparent [&::-webkit-scrollbar]:w-2">
+                class="block w-full lg:w-auto min-w-60 h-auto max-h-screen bg-(--color-bg) lg:border-solid lg:border-r-2 border-b-2 border-gray-300 lg:rounded-r-xl basis-0.5 absolute top-[101%] left-0 overflow-hidden overflow-y-scroll z-50 [&::-webkit-scrollbar]:bg-transparent [&::-webkit-scrollbar]:w-2">
                 <HeaderTitleLink highlight highlight-color="neutral" :class="'not-sr-only xl:sr-only'" />
                 <UNavigationMenu highlight-color="neutral" orientation="vertical" :items="items" :ui="{
                     root: '',

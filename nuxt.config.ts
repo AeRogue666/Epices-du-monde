@@ -61,5 +61,9 @@ export default defineNuxtConfig({
     alias: {
       directus: 'http://localhost:3000/directus/assets'
     }
+  },
+  icon: {
+    mode: 'css',
+    cssLayer: 'base'
   }
 });

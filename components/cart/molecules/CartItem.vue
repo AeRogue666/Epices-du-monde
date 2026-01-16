@@ -2,91 +2,92 @@
 import { UCard } from '#components';
 import { capitalize } from 'vue';
 
-defineProps<{
-    product: {
-        id: string,
-        title: string,
-        image: {
-            id: string,
-            description: string,
-            width?: number,
-            height?: number,
-        },
-        slug: string,
-        poids_net: number,
-        price: number,
-        price_per_kg?: number,
-        reduction_rate?: number,
-        old_price?: number,
-        stock: number,
-        availability?: any,
-        product_number: number,
-    },
+const props = defineProps<{
+    product: any | null,
+    quantity: number,
+    unavailable: boolean,
 }>();
 
 defineEmits<{
-    productId: [value: string]
+    removeProductFromCart: [value: string]
 }>();
-const productNumber = defineModel({ default: 1 });
 
-const config = useRuntimeConfig(),
-    apiPublicEndpoint = config.public.apiBase;
+const { getImageUrl, getImageDescription, getImageDimensions } = useProductImage(),
+    cartStore = useCartStore();
+
+// Computed for accessibility
+const imageAlt = computed(() => { props.product ? getImageDescription(props.product.image_id) || props.product.title : capitalize('produit indisponible') }),
+    imageDimensions = computed(() => getImageDimensions(props.product.image_id));
+
+const productQuantity = ref<number>(props.quantity | 1);
+
+watch(productQuantity, (qty) => {
+    if (props.product) {
+        cartStore.updateQuantity(props.product.id, qty, props.product.stock);
+    }
+});
 </script>
 
 <template>
-    <UCard class="flex flex-row items-center w-full h-auto" :ui="{
-        header: 'p-0 sm:p-0',
-        body: 'w-full h-auto p-0 sm:p-0 md:mx-6',
-        footer: 'p-0 ml-auto mr-6 sm:p-0'
+    <UCard class="flex flex-col md:flex-row items-center w-full h-auto my-4" :ui="{
+        header: 'my-4 p-0 sm:p-0',
+        body: 'w-full h-auto md:mx-6',
+        footer: 'flex flex-row justify-between items-center w-full px-6 py-0'
     }">
+        <!-- IMAGE -->
         <template #header>
             <a :href="`/product/${product.id}/${product.slug}`"
-                class="flex w-full h-auto no-underline hover:text-blue-600">
-                <NuxtPicture v-if="product.image" :src="`${apiPublicEndpoint}/assets/${product.image.id}`"
-                    class="w-full max-w-90 min-w-24 max-h-auto min-h-12 rounded-lg" :alt="product.image.description"
-                    :width="product.image.width" :height="product.image.height" />
-                <NuxtImg v-else
-                    src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/Center_of_the_Milky_Way_Galaxy_IV_%E2%80%93_Composite.jpg/960px-Center_of_the_Milky_Way_Galaxy_IV_%E2%80%93_Composite.jpg"
-                    class="w-full max-w-90 min-w-24 max-h-auto min-h-12 rounded-lg"
-                    alt="NASA/JPL-Caltech/ESA/CXC/STScI, Public domain, via Wikimedia Commons" />
+                class="w-full h-auto no-underline gap-4 hover:text-blue-600">
+                <NuxtPicture v-if="product.image_id" :src="getImageUrl(product.image_id, {
+                    width: 240, height: 135, fit: 'cover', format: 'webp', quality: 90
+                }) || `directus/${product.image_id}`"
+                    class="object-cover object-top aspect-video w-full max-w-90 min-w-24 max-h-auto min-h-12 rounded-lg"
+                    :alt="imageAlt" :width="240" :height="135" loading="lazy" decoding="async" fetchpriority="low" />
+                <div v-else class="flex items-center justify-center w-26 h-22 bg-gray-200 rounded-lg">
+                    <span>Image indisponible</span>
+                </div>
             </a>
         </template>
 
-        <!-- <a :href="`/product/${product.id}/${product.slug}`"
-            class="flex flex-col items-baseline w-full h-full no-underline gap-4 hover:text-blue-600">
-            <h2 class="w-max text-xl font-semibold">{{ capitalize(product.title) }}</h2>
-            <div class="flex flex-row justify-between items-center w-full h-full">
-                <span class="text-base">{{ capitalize('price') }}: {{ product.price }}€ </span>
-                <span class="text-base">{{ capitalize('number') }}: {{ product.product_number }}</span>
-            </div>
-        </a> -->
-
-        <UContainer class="flex flex-col items-baseline w-full h-full no-underline gap-4">
-            <a :href="`/product/${product.id}/${product.slug}`" class="no-underline hover:text-blue-600">
-                <h2 class="w-max text-xl font-semibold">{{ capitalize(product.title) }}</h2>
-            </a>
-            <UContainer class="flex flex-row justify-between items-center w-full h-full gap-6">
-                <UFormField label="Nombre de produits" help="" class="mt-6 mb-9" required>
-                    <UInputNumber v-if="product.stock !== 0" v-model="productNumber" :default-value="1" :min="1"
-                        :max="product.stock" size="xl" placeholder="Spécifier le nombre de produits"
-                        :increment="{ color: 'neutral', variant: 'solid', size: 'xl' }"
-                        :decrement="{ color: 'neutral', variant: 'solid', size: 'xl' }" />
-                    <UInputNumber v-else v-model="product.stock" size="xl"
-                        placeholder="Ce produit n'est plus disponible"
-                        :increment="{ color: 'neutral', variant: 'solid', size: 'xl' }"
-                        :decrement="{ color: 'neutral', variant: 'solid', size: 'xl' }" disabled />
-                </UFormField>
-                <span class="text-md font-semibold">{{ capitalize('price') }}: {{ product.price }}€ </span>
+        <template #default>
+            <UContainer class="flex flex-col items-baseline w-full h-full p-0 no-underline gap-4">
+                <a :href="`/product/${product.id}/${product.slug}`" class="no-underline hover:text-blue-600">
+                    <span class="text-base font-semibold">{{ capitalize(product.title) }}</span>
+                </a>
+                <UContainer class="flex flex-col md:flex-row justify-between items-baseline w-full h-full gap-6">
+                    <UFormField label="Nombre de produits" help="" class="my-3 p-0" required>
+                        <UInputNumber v-if="product.stock > 0" v-model="productQuantity" :default-value="1" :min="1"
+                            :max="product.stock" size="xl" placeholder="Spécifier le nombre de produits"
+                            :increment="{ color: 'neutral', variant: 'solid', size: 'xl' }"
+                            :decrement="{ color: 'neutral', variant: 'solid', size: 'xl' }" :ui="{
+                                increment: 'pe-0',
+                                decrement: 'ps-0',
+                            }" />
+                    </UFormField>
+                    <span class="text-md font-semibold">{{ capitalize('price') }}: {{ product.price }}€ </span>
+                </UContainer>
             </UContainer>
-        </UContainer>
+        </template>
 
         <template #footer>
-            <div
-                class="flex flex-row items-center w-full absolute top-[5%] left-[90%] gap-4 md:top-[9%] md:left-[90%] xl:top-[7.9%] xl:left-[90%] 2xl:top-[9%]">
-                <UIcon name="fa6-solid:circle" :style="`color: ${product.availability.color}`" />
+            <div class="flex flex-row items-center w-full">
+                <!-- absolute top-[5%] left-[90%] gap-4 md:top-[9%] md:left-[90%] xl:top-[7.9%] xl:left-[90%] 2xl:top-[9%] -->
+                <LazyUIcon name="fa7-solid:circle" :style="`color: ${(
+                    product.stock > 0 && product.availability == 'in_stock') || product.availability == 'not_available'
+                    ? (product.stock > 0 && product.availability == 'in_stock')
+                        ? 'green'
+                        : 'orange'
+                    : 'red'}`" />
+                <span>{{
+                    product.stock > 0 || product.availability == 'in_stock'
+                        ? `${capitalize($t('main.product.availability.in_stock'))} (${product.stock})`
+                        : (product.stock >= 0) && product.availability == 'not_available'
+                            ? `${capitalize($t('main.product.availability.not_available'))}`
+                            : `${capitalize($t('main.product.availability.out_of_stock'))}`
+                }}</span>
             </div>
-            <UButton color="error" variant="ghost" size="xl" icon="i-fa6-solid:trash-can" class="relative"
-                @click.prevent="$emit('productId', product.id)" />
+            <UButton color="error" variant="ghost" size="xl" icon="fa7-solid:trash-can" class="relative"
+                @click.prevent="$emit('removeProductFromCart', product?.id)" />
         </template>
     </UCard>
 </template>
