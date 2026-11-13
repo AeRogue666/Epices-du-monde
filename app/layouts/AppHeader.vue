@@ -3,7 +3,7 @@ const cartStore = useCartStore();
 const mobileMenuOpen = ref(false);
 
 const navLinks = [
-    { label: "Accueil", to: "/" },
+    // { label: "Accueil", to: "/" },
     { label: "Catalogue", to: "/products" },
     { label: "Promotions", to: "/products?filter=promo" },
     { label: "Nouveautés", to: "/products?filter=new" },

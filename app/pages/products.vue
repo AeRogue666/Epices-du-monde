@@ -141,7 +141,7 @@ useSeoMeta({
         </div>
 
         <div v-if="filteredProducts.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <ProductCard v-for="product in filteredProducts" :key="product.id" :product="product" />
+            <ProductCard v-for="product in filteredProducts" :key="product.id" :product="product" :heading-tag="'h2'" />
         </div>
 
         <div v-else

@@ -1,9 +1,15 @@
 <script setup lang="ts">
 import type { Product } from "@/types/product";
 
-const props = defineProps<{
-    product: Product;
-}>();
+const props = withDefaults(
+    defineProps<{
+        product: Product;
+        headingTag?: "h2" | "h3" | "h4";
+    }>(),
+    {
+        headingTag: "h3",
+    }
+);
 
 const cartStore = useCartStore();
 const toast = useToast();
@@ -30,10 +36,12 @@ const handleAddToCart = () => {
                 class="h-full w-full object-cover transition duration-300 group-hover:scale-105" />
 
             <div class="absolute top-3 left-3 flex flex-wrap gap-1.5">
-                <UBadge v-if="product.isPromo" color="primary" variant="solid" size="md" icon="i-lucide-badge-percent" class="bg-(--primary-color-2) text-(--black)">
+                <UBadge v-if="product.isPromo" color="primary" variant="solid" size="md" icon="i-lucide-badge-percent"
+                    class="bg-(--primary-color-2) text-(--black)">
                     Promo
                 </UBadge>
-                <UBadge v-if="product.isNew" color="secondary" variant="solid" size="md" icon="i-lucide-star" class="bg-(--primary-color) text-(--black)">
+                <UBadge v-if="product.isNew" color="secondary" variant="solid" size="md" icon="i-lucide-star"
+                    class="bg-(--primary-color) text-(--black)">
                     Nouveau
                 </UBadge>
             </div>
@@ -54,11 +62,12 @@ const handleAddToCart = () => {
                     </span>
                 </div>
 
-                <h3 class="text-base font-semibold text-highlighted line-clamp-2 group-hover:text-primary transition">
+                <component :is="headingTag"
+                    class="text-base font-semibold text-highlighted line-clamp-2 py-4 px-2 group-hover:text-primary transition">
                     <NuxtLink :to="`/product/${product.slug}`" class="after:absolute after:inset-0 focus:outline-none">
                         {{ product.name }}
                     </NuxtLink>
-                </h3>
+                </component>
 
                 <p class="text-sm text-muted line-clamp-2">
                     {{ product.description }}

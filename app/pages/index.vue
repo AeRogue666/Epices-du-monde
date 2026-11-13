@@ -60,7 +60,7 @@ const newProducts = computed(() => PRODUCTS.filter((p) => p.isNew).slice(0, 4));
                 </div>
 
                 <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-                    <NuxtLink v-for="cat in CATEGORIES" :key="cat.id" :to="`/prodcuts?category=${cat.id}`"
+                    <NuxtLink v-for="cat in CATEGORIES" :key="cat.id" :to="`/products?category=${cat.id}`"
                         class="group flex flex-col items-center justify-center p-6 rounded-xl border border-default bg-default hover:border-primary hover:shadow-md transition focus-visible:outline-2 focus-visible:outline-primary text-center gap-3">
                         <div
                             class="p-3 rounded-full bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white transition">
