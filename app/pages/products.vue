@@ -1,212 +1,164 @@
 <script setup lang="ts">
-import ProductsFilterModal from '~/components/products/organisms/productsFilterModal.vue';
-import ProductsItem from '~/components/products/organisms/productsItem.vue';
-import ProductsItemSkeleton from '~/components/products/ui/productsItemSkeleton.vue';
-import { useProductsStore } from '~/stores/ProductsStore';
-import { categoryGroups } from '~/config/categories';
+import { PRODUCTS, CATEGORIES } from '~/data/products';
 
-const productsStore = useProductsStore(),
-    filterStore = useFilterStore(),
-    config = useRuntimeConfig(),
-    apiPublicEndpoint = config.public.apiBase;
+const route = useRoute();
+const router = useRouter();
 
-const { query } = useRoute(),
-    router = useRouter();
+const search = ref((route.query.q as string) || "");
+const selectedCategory = ref((route.query.category as string) || "all");
+const activeFilter = ref((route.query.filter as string) || "all");
+const sortBy = ref<"default" | "price-asc" | "price-desc">("default");
 
-// Reactive query params
-const searchQuery = computed(() => filterStore.search as string || ''),
-    categoriesQuery = computed(() => {
-        const ctg = filterStore.categories;
-        if (!ctg) return []
-        return Array.isArray(ctg) ? ctg : [ctg]
-    }),
-    pageParams = computed(() => filterStore.page as number || 1);
+watch(() => route.query, (newQuery) => {
+    search.value = (newQuery.q as string) || "";
+    selectedCategory.value = (newQuery.category as string) || "all";
+    activeFilter.value = (newQuery.filter as string) || "all";
+});
 
-const buildApiUrl = async () => {
-    const params = new URLSearchParams();
+const sortOptions = [
+    { label: "Pertinence", value: "default" },
+    { label: "Prix croissant", value: "price-asc" },
+    { label: "Prix décroissant", value: "price-desc" },
+];
 
-    // Search filter
-    if (searchQuery.value) {
-        params.append('search', searchQuery.value)
+const quickFilters = [
+    { label: "Tous", value: "all", color: "" },
+    { label: "Promotions", value: "promo" },
+    { label: "Nouveautés", value: "new" },
+    { label: "En stock", value: "instock" },
+];
+
+const filteredProducts = computed(() => {
+    let list = [...PRODUCTS];
+
+    if (search.value.trim()) {
+        const q = search.value.toLowerCase().trim();
+        list = list.filter((p) => p.name.toLowerCase().includes(q) || p.origin.toLowerCase().includes(q));
     }
 
-    // Categories filter
-    if (categoriesQuery.value.length > 0) {
-        categoriesQuery.value.forEach(ctg => {
-            params.append('filter[Product_Categorie][_in]', ctg as string)
-        })
+    if (selectedCategory.value !== 'all') {
+        list = list.filter((p) => p.category === selectedCategory.value);
     }
 
-    // Page params
-    /* if (pageParams.value) {
-        params.append('page', pageParams.value)
-    } */
+    if (activeFilter.value === "promo") {
+        list = list.filter((p) => p.isPromo);
+    } else if (activeFilter.value === "new") {
+        list = list.filter((p) => p.isNew);
+    } else if (activeFilter.value === "instock") {
+        list = list.filter((p) => p.inStock);
+    }
 
-    // Standard Directus filters
-    params.append('fields', '*,Product_Categorie.*,product_allergie.*,Product_label.*,nutrition_id.*,image_id.*');
-    params.append('filter[status][_eq]', 'published');
+    if (sortBy.value === "price-asc") {
+        list.sort((a, b) => a.price - b.price);
+    } else if (sortBy.value === "price-desc") {
+        list.sort((a, b) => b.price - a.price);
+    }
 
-    const queryString = params.toString();
-    return `${apiPublicEndpoint}/items/Product?${queryString ? `${queryString}` : ''}`
+    return list;
+});
+
+const hasActiveFilters = computed(() => search.value.trim() !== "" || selectedCategory.value !== "all" || activeFilter.value !== "all");
+
+const resetFilters = () => {
+    search.value = "";
+    selectedCategory.value = "all";
+    activeFilter.value = "all";
+    sortBy.value = "default";
+    router.replace({ query: {} });
 };
 
-// Products loading with useAsyncData
-const { data: products, pending, error, refresh } = await useAsyncData<Product[]>('Product', async () => {
-    const url = await buildApiUrl();
-
-    try {
-        const response = await $fetch<{ data: Product[] }>(url, {
-            method: 'GET',
-            query: {
-                page: filterStore.page
-            }
-        });
-
-        // Calling images details for each product
-        const enrichedProducts = await Promise.all(
-            response.data.map(async (product) => {
-                if (typeof product.image_id === 'string' && product.image_id) {
-                    try {
-                        const imageResponse = await $fetch<{ data: Image }>(`${apiPublicEndpoint}/files`, {
-                            query: {
-                                filter: { id: { _eq: product.image_id } },
-                                fields: 'id,description,width,height',
-                            }
-                        });
-
-                        if (imageResponse.data) {
-                            // Replacing image_id string by object
-                            return {
-                                ...product,
-                                image_id: Array.isArray(imageResponse.data) ? imageResponse.data[0] : imageResponse.data
-                            }
-                        }
-                    } catch (error) {
-                        console.error(`Erreur lors du chargement de l'image ${product.image_id}: `, error);
-                    }
-                }
-
-                return product
-            })
-        );
-
-        // Updating productsStore
-        productsStore.setProducts(enrichedProducts)
-        return enrichedProducts
-    } catch (error) {
-        console.error('Erreur lors du chargement des produits: ', error);
-        throw error
-    }
-},
-    {
-        // Automatically reload when query params is updated
-        watch: [searchQuery, categoriesQuery, pageParams],
-        server: true, // Server-side rendering
-        lazy: false, // Client-side lazy loading
-    });
-
-// Loading categories
-const { data: categoriesData } = await useFetch<{ data: Categorie[] }>(`${apiPublicEndpoint}/items/Categorie`, {
-    query: {
-        fields: 'id,name,value,product_id,sort',
-        filter: { status: { _eq: 'published' } },
-        sort: 'sort,name',
-    },
-});
-
-// Organize categories following categoryGroups
-const organizedCategories = computed(() => {
-    if (!categoriesData.value?.data) return []
-
-    const categoriesMap = new Map(
-        categoriesData.value.data.map(ctg => [ctg.id, ctg])
-    );
-
-    return categoryGroups.map(group => ({
-        ...group,
-        children: group.children
-            .map(childId => categoriesMap.get(childId))
-            .filter(Boolean) as Categorie[]
-    })).filter(group => group.children.length > 0);
-});
-
-// Resetting filters
-const clearFilters = () => {
-    router.push({ query: {} })
-};
-
-// Categories loading with useFetch
-const { data: categories } = await useFetch<{ data: Categorie[] }>(`${apiPublicEndpoint}/items/Categorie`, {
-    query: {
-        fields: 'id, name, value, icon, product_id',
-        filter: { status: { _eq: 'published' } },
-    },
-});
-
-const filteredProductsCount = computed(() => products.value?.length || 0),
-    hasActiveFilters = computed(() => searchQuery.value.length > 0 || categoriesQuery.value.length > 0);
-
-useHead({
-    title: 'Epices du Monde | Nos produits',
-    meta: [
-        {
-            name: 'description',
-            content: 'Découvrez notre sélection de produits',
-        },
-    ],
+useSeoMeta({
+    title: "Catalogue - Epices du Monde",
+    description: "Parcourez notre catalogue complet d'épices, sauces, nouilles, thés et produits asiatiques."
 });
 </script>
 
 <template>
-    <div class="flex flex-col items-center w-full h-full gap-2">
-        <h1 class="text-5xl font-semibold">Products</h1>
-        <section class="flex flex-col items-center w-full h-auto gap-6">
-            <div class="flex flex-col items-center mt-6 gap-4">
-                <div v-if="categories?.data" class="flex flex-row items-center w-full h-full gap-6">
-                    <!-- Section Filtres -->
-                    <ProductsFilterModal :categories-list="organizedCategories" :categories-query="categoriesQuery" />
-                </div>
-                <div v-if="!pending" class="flex flex-col items-start gap-4 xl:flex-row xl:items-center">
-                    <p class="text-base">
-                        <span class="font-semibold">{{ filteredProductsCount }}</span>
-                        produit{{ filteredProductsCount > 1 ? 's' : '' }} trouvé{{ filteredProductsCount > 1 ? 's' : ''
-                        }}
-                    </p>
-                </div>
-                <!-- Section Tags -->
-                <!-- <ProductsMoleculesTagsList :tags-list="tagsList" @id="updateTagsList" /> -->
-            </div>
-            <div class="flex flex-col items-center gap-6">
-                <!-- Loading state -->
-                <div v-if="pending">
-                    <ProductsItemSkeleton />
+    <UContainer class="py-10 sm:py-14 space-y-8">
+        <header class="space-y-2 border-b border-default pb-6">
+            <h1 class="text-3xl sm:text-5xl font-bold tracking-tight text-highlighted">
+                Notre catalogue
+            </h1>
+            <p class="text-muted text-base sm:text-lg max-w-2xl">
+                Explorez nos saveurs venues d'Asie et du monde entier, filtrables par rayon ou origine.
+            </p>
+        </header>
+
+        <section aria-label="Filtres et recherche" class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+                <div class="md:col-span-5">
+                    <UInput v-model="search" icon="i-lucide-search" size="lg"
+                        placeholder="Rechercher une épice, une sauce, un pays..." aria-label="Rechercher un produit"
+                        class="w-full">
+                        <template v-if="search" #trailing>
+                            <UButton icon="i-lucide-x" color="neutral" variant="link" size="xs"
+                                aria-label="Effacer la recherche" @click="search = ''" />
+                        </template>
+                    </UInput>
                 </div>
 
-                <!-- Error state -->
-                <div v-else-if="error">
-                    <span>Une erreur est survenue lors du chargement des produits</span>
-                    <UButton @click.prevent="refresh()" color="neutral" variant="outline" size="xl"
-                        class="flex items-center w-auto h-auto text-xl p-4 border-2 border-solid border-(--color-text) rounded-lg relative">
-                        Réessayer</UButton>
+                <div class="md:col-span-4 flex flex-wrap items-center gap-1.5" role="group"
+                    aria-label="Filtres rapides">
+                    <UButton v-for="filter in quickFilters" :key="filter.label" size="md"
+                        :color="activeFilter === filter.value ? 'primary' : 'neutral'"
+                        :variant="activeFilter === filter.value ? 'solid' : 'soft'"
+                        @click="activeFilter = filter.value">
+                        {{ filter.label }}
+                    </UButton>
                 </div>
 
-                <!-- Products list -->
-                <div v-else-if="products && products.length > 0">
-                    <ul class="flex flex-col gap-8 lg:gap-y-16 sm:grid sm:grid-cols-2 lg:grid-cols-3">
-                        <li v-for="(item, i) of products" :key="i">
-                            <ProductsItem :product="item" />
-                        </li>
-                    </ul>
-                </div>
-
-                <!-- Empty state -->
-                <div v-else>
-                    <p>Aucun produit ne correspond à vos critères de recherche.</p>
-                    <UButton v-if="hasActiveFilters" @click.prevent="clearFilters" color="neutral" variant="outline">
-                        Voir tous les produits</UButton>
+                <div class="md:col-span-3">
+                    <USelect v-model="sortBy" :items="sortOptions" value-key="value" size="lg"
+                        aria-label="Trier les produits par" class="w-full" />
                 </div>
             </div>
-            <UPagination :page="pageParams" :items-per-page="15" />
+
+            <div class="flex items-center gap-2 overflow-x-auto pb-1" role="group" aria-label="Filtrer par paryon">
+                <UButton size="sm" :color="selectedCategory === 'all' ? 'primary' : 'neutral'"
+                    :variant="selectedCategory === 'all' ? 'outline' : 'ghost'" @click="selectedCategory = 'all'">
+                    Tous les rayons
+                </UButton>
+                <UButton v-for="cat in CATEGORIES" :key="cat.id" :icon="cat.icon" size="sm"
+                    :color="selectedCategory === 'all' ? 'primary' : 'neutral'"
+                    :variant="selectedCategory === 'all' ? 'outline' : 'ghost'" @click="selectedCategory = cat.id">
+                    {{ cat.label }}
+                </UButton>
+            </div>
         </section>
-    </div>
+
+        <div class="flex items-center justify-between text-sm text-muted" aria-live="polite">
+            <p>
+                <strong class="text-highlighted font-semibold">
+                    {{ filteredProducts.length }}
+                </strong>
+                Produit{{ filteredProducts.length > 1 ? 's' : '' }} affiché{{ filteredProducts.length > 1 ? 's' : '' }}
+            </p>
+
+            <UButton v-if="hasActiveFilters" variant="link" color="primary" size="sm" icon="i-lucide-rotate-ccw"
+                @click="resetFilters">
+                Réinitialiser les filtres
+            </UButton>
+        </div>
+
+        <div v-if="filteredProducts.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <ProductCard v-for="product in filteredProducts" :key="product.id" :product="product" />
+        </div>
+
+        <div v-else
+            class="flex flex-col items-center justify-center py-16 px-4 text-center rounded-2xl border border-dashed border-default space-y-4">
+            <UIcon name="i-lucide-search-x" class="w-12 h-12 text-muted" aria-hidden=true />
+            <div cxlass="space-y-1">
+                <h2 class="text-lg font-semibold text-highlighted">
+                    Aucun produit trouvé
+                </h2>
+                <p class="text-sm text-muted max-w-md">
+                    Aucun article ne correspond à votre sélection actuelle.
+                    Essayez un autre mot-clé ou réintialisez les filtres.
+                </p>
+            </div>
+            <UButton color="primary" variant="soft" @click="resetFilters">
+                Afficher tout le catalogue
+            </UButton>
+        </div>
+    </UContainer>
 </template>

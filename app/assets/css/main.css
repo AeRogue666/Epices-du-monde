@@ -3,9 +3,15 @@
 @import "./base.css";
 
 @theme {
+  --font-sans: "Roboto", sans-serif;
+  --font-serif: "Noto Serif", serif;
   --ui-bg: var(--color-bg);
-  --ui-error: oklch(0.56 0.1973 26.4);
-  --ui-warning: oklch(0.6996 0.201959 44.4414);
+  --ui-primary: var(--primary-color);
+  --ui-error: var(--primary-color);
+  --ui-warning: var(--primary-color-2);
+  --secondary-color-1: var(--secondary-color-1);
+  --secondary-color-2: var(--secondary-color-2);
+  --secondary-color-3: var(--secondary-color-3);
 }
 
 *,
@@ -18,104 +24,10 @@
 body {
   background-color: var(--color-bg);
   color: var(--color-text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
 }
 
-header {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  width: 100%;
-  height: 7rem;
-  position: relative;
-  z-index: 100;
+h1, h2, h3, .font-serif {
+  font-family: var(--font-serif);
 }
-
-main {
-  display: block;
-  width: 100%;
-  height: 100%;
-  min-height: 90vh; /* 43.75rem */
-  /* margin-top: 5.78rem; */
-  overflow-y: visible;
-  position: relative;
-  scrollbar-width: none;
-}
-
-.title {
-  font-family: Noto Serif, serif;
-  font-optical-sizing: auto;
-  font-variation-settings: "wdth" 100;
-}
-
-/* 
-:root {
-  --vslidegap: 1rem;
-  --vslidewidth: calc(37% - var(--vslidegap) * 0.92);
-}
-
-ul {
-  display: flex;
-  flex-grow: 1;
-  gap: var(--vslidegap);
-  overflow-x: auto;
-  padding-top: 2px;
-  padding-inline-start: 2px;
-  padding-right: 4px;
-  position: relative;
-  scrollbar-width: none;
-}
-
-li {
-  flex-basis: round(nearest, var(--vslidewidth), 1px);
-}   
-*/
-
-/* Arrows */
-/* .controls button {
-    width: 5rem;
-    height: 15rem;
-    background-color: var(--color-text);
-    opacity: 0.9;
-    color: var(--color-bg);
-  } */
-
-.carousel-ctg--controls button {
-  top: 90%;
-  &:nth-child(1) {
-    right: 100%;
-  }
-  &:nth-child(2) {
-    left: 100%;
-  }
-}
-
-.carousel-products--controls button {
-  top: 78%;
-  &:nth-child(1) {
-    right: 100%;
-  }
-  &:nth-child(2) {
-    left: 100%;
-  }
-}
-
-.red {
-  background-color: var(--primary-color);
-}
-
-.orange {
-  background-color: var(--primary-color-2);
-}
-
-.yellow {
-  background-color: var(--secondary-color-1);
-}
-
-.orange {
-  background-color: var(--secondary-color-2);
-}
-
-.green {
-  background-color: var(--secondary-color-3);
-}
-

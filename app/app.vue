@@ -14,19 +14,25 @@ useSeoMeta({
 
 <template>
   <UApp>
-    <AppHeader />
+    <NuxtLayout>
+      <a href="#main"
+        class="sr-only focus:not-sr-only focus:fixed focus:top^-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary focus:text-white focus:rounded-md">
+        {{ $t('header.skip_content') }}
+      </a>
+      <AppHeader />
 
-    <main id="main" class="min-h-screen"> <!-- class="min-h-[calc(100vh-calc(.25rem*16))]" -->
-      <NuxtRouteAnnouncer />
-      <NuxtPage />
-    </main>
-    <AppFooter>
-      <template #down>
-        <span class="text-base">© 2009-{{ new Date().getFullYear() }} Epices Du Monde. {{
-          capitalize($t('footer.copyright')) }}</span>
-        <span class="text-base">Epices Du Monde - 4 chemin du moulon - 07200 Aubenas</span>
-        <span class="text-base">Siret : 82402921900014</span>
-      </template>
-    </AppFooter>
+      <main id="main" class="min-h-screen"> <!-- class="min-h-[calc(100vh-calc(.25rem*16))]" -->
+        <NuxtRouteAnnouncer />
+        <NuxtPage />
+      </main>
+      <AppFooter>
+        <template #down>
+          <span class="text-base">© 2009-{{ new Date().getFullYear() }} Epices Du Monde. {{
+            capitalize($t('footer.copyright')) }}</span>
+          <span class="text-base">Epices Du Monde - 4 chemin du moulon - 07200 Aubenas</span>
+          <span class="text-base">Siret : 82402921900014</span>
+        </template>
+      </AppFooter>
+    </NuxtLayout>
   </UApp>
 </template>

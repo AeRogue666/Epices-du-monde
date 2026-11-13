@@ -1,102 +1,77 @@
 <script setup lang="ts">
-const columns = reactive<{
-    label: string,
-    children?: {
-        label: string,
-        to?: string,
-        target?: string,
-        icon?: string,
-    }[]
-}[]>
-    ([
-        {
-            label: 'Aide & Contact',
-            children: [
-                {
-                    label: 'Contact',
-                    to: '/contact',
-                },
-                {
-                    label: 'Livraison',
-                    to: '/livraison',
-                },
-            ]
-        },
-        {
-            label: 'Légal',
-            children: [
-                {
-                    label: 'Mentions légales',
-                    to: '/mentions-legales',
-                },
-                {
-                    label: 'RGPD',
-                    to: '/rgpd',
-                },
-                {
-                    label: 'CGV',
-                    to: '/cgv',
-                },
-            ]
-        },
-        {
-            label: 'Suivez-nous',
-            children: [
-                {
-                    label: 'Facebook',
-                    to: '',
-                    target: '_blank',
-                    icon: 'fa6-brands:facebook'
-                },
-                {
-                    label: 'Instagram',
-                    to: '',
-                    target: '_blank',
-                    icon: 'fa6-brands:instagram'
-                },
-            ]
-        },
-        {
-            label: 'Paiement',
-            children: [
-                {
-                    label: 'Visa',
-                    icon: 'fa6-brands:cc-visa'
-                },
-                {
-                    label: 'MasterCard',
-                    icon: 'fa6-brands:cc-mastercard'
-                },
-                {
-                    label: 'PayPal',
-                    icon: 'fa6-brands:cc-paypal'
-                }
-            ]
-        }
-    ]);
+const navigationLinks = [
+    { label: "Accueil", to: "/" },
+    { label: "Tous les produits", to: "/products" },
+    { label: "Promotions", to: "/products?filter=promo" },
+    { label: "Nouveautés", to: "/products?filter=new" },
+    { label: "Mon panier", to: "/cart" },
+];
+
+const categoryLinks = [
+    { label: "Epices & Curry", to: "/products?category=epices" },
+    { label: "Sauces Asiatiques", to: "/products?category=sauces" },
+    { label: "Nouilles & Riz", to: "/products?category=nouilles" },
+    { label: "Thés & Boissons", to: "/products?category=boissons" },
+];
 </script>
 
 <template>
-    <UFooter class="grid grid-cols-1 xl:gap-8 w-full border-t border-default" :ui="{ container: 'hidden', }">
-        <template #left>
-            <div class="flex flex-col items-center mb-10 xl:mb-0">
-                <slot name="up"></slot>
+    <footer class="border-t border-default bg-stone-50 dark:bg-neutral-950 mt-auto">
+        <UContainer class="py-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div class="space-y-3">
+                <p class="font-serif text-lg font-bold text-primary">
+                    Epices du Monde
+                </p>
+                <p class="text-sm text-muted leading-relaxed">
+                    Epicerie asiatique et exotique. Projet showcase repensé avec Nuxt 4 et Nuxt UI.
+                </p>
             </div>
-        </template>
 
-        <template #top>
-            <UContainer>
-                <UFooterColumns :columns="columns" :ui="{
-                    root: 'md:grid md:grid-cols-1 xl:grid-cols-2 xl:gap-8 mt-6 space-x-4',
-                    center: 'flex flex-col md:grid grid-flow-col auto-cols-fr xl:col-span-2 gap-8',
-                }" />
-            </UContainer>
-        </template>
+            <div class="space-y-3">
+                <h2 class="text-sm font-semibold uppercase tracking-wider text-highlighted">
+                    Navigation
+                </h2>
+                <ul class="space-y-2">
+                    <li v-for="link in navigationLinks" :key="link.to">
+                        <NuxtLink :to="link.to" class="text-sm text-muted hover:text-primary transition">
+                            {{ link.label }}
+                        </NuxtLink>
+                    </li>
+                </ul>
+            </div>
 
-        <template #bottom>
-            <div class="flex flex-col items-center mt-10 xl:mt-0">
+            <div class="space-y-3">
+                <h2 class="text-sm font-semibold uppercase tracking-wider text-highlighted">
+                    Rayons
+                </h2>
+                <ul class="space-y-2">
+                    <li v-for="link in categoryLinks" :key="link.to">
+                        <NuxtLink :to="link.to" class="text-sm text-muted hover:text-primary transition">
+                            {{ link.label }}
+                        </NuxtLink>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="space-y-3">
+                <h2 class="text-sm font-semibold uppercase tracking-wider text-highlighted">
+                    Boutique
+                </h2>
+                <p class="text-sm text-muted">
+                    4 chemin du Moulon, 07200 Aubenas
+                </p>
+                <div class="flex items-center gap-3 pt-2 text-muted" aria-label="Moyens de paiement">
+                    <UIcon name="i-fa7-brands-cc-visa" class="w-7 h-7" aria-hidden=true />
+                    <UIcon name="i-fa7-brands-cc-mastercard" class="w-7 h-7" aria-hidden=true />
+                    <UIcon name="i-fa7-brands-cc-paypal" class="w-7 h-7" aria-hidden=true />
+                </div>
+            </div>
+        </UContainer>
+
+        <div class="border-t border-default py-6">
+            <UContainer class="flex flex-col sm:flex-row items-center justify-between gap-2 text-center sm:text-left">
                 <slot name="down"></slot>
-            </div>
-        </template>
-    </UFooter>
+            </UContainer>
+        </div>
+    </footer>
 </template>

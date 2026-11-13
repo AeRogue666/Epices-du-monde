@@ -1,32 +1,25 @@
 <script setup lang="ts">
-import { capitalize } from 'vue';
+import type { NuxtError } from '#app';
 
-const route = useRoute(),
-    fullPath = route.fullPath.replace('/', '');
+defineProps<{
+    error: NuxtError;
+}>();
 </script>
 
 <template>
-    <UError :error="{
-        statusCode: 404,
-        statusMessage: 'page not found',
-        message: `the page you are looking for doesn't exist`,
-    }" :clear="{
-        color: 'neutral',
-        size: 'xl',
-        icon: 'fa6-solid:arrow-left',
-        class: 'rounded-full',
-    }" />
-
-    <!-- <UContainer class="max-w-[100rem] text-center gap-6">
-        <h1
-            class="text-5xl sm:text-7xl text-pretty text-highlighted tracking-tight font-bold leading-none mb-4 sm:text-[7rem] lg:mt-16 tabular-nums text-[5rem]">
-            <span class="text-error">404</span>
-        </h1>
-        <span class="font-semibold mb-2 sm:text-3xl text-2xl">{{ capitalize('page not found:') }} {{ fullPath }}</span>
-        <UContainer class="flex flex-row justify-center items-center w-full h-auto mt-6">
-            <ULink href="/" class="font-medium hover:text-[--secondary-color-3] text-sm underline underline-offset-3">
-                {{ capitalize('go back home') }}
-            </ULink>
-        </UContainer>
-    </UContainer> -->
+    <UApp>
+        <main class="min-h-screen flex items-center justify-center p-6">
+            <UError :error="{
+                statusCode: error?.status || 404,
+                statusMessage: 'Page introuvable',
+                message: 'La page que vous recherchez n\'existe pas ou a été déplacée.'
+            }" :clear="{
+                label: 'Retourner à l\'accueil',
+                color: 'primary',
+                size: 'xl',
+                icon: 'fa6-solid:arrow-left',
+                class: 'rounded-full',
+            }" />
+        </main>
+    </UApp>
 </template>
