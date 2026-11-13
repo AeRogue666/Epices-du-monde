@@ -9,11 +9,7 @@ export default defineNuxtConfig({
     "@nuxt/fonts",
     "@nuxt/icon",
     "@pinia/nuxt",
-    "@vueuse/motion/nuxt",
-    "@nuxtjs/mdc",
     "@nuxtjs/i18n",
-    "@nuxtjs/device",
-    "@tailwindcss/vite",
   ],
   css: ["~/assets/css/main.css"],
   mdc: {
@@ -28,39 +24,19 @@ export default defineNuxtConfig({
     ],
     defaultLocale: "fr",
     strategy: "no_prefix",
-  },
-  plugins: [],
-  runtimeConfig: {
-    public: {
-      apiBase: process.env.NUXT_API_ENDPOINT || "http://localhost:3000/directus",
-      motion: {
-        directives: {},
-      },
-    },
-  },
-  routeRules: {
-    "/directus/**": {
-      proxy: `${import.meta.env.NUXT_DIRECTUS_API}/**`,
-      prerender: true,
-    },
+    detectBrowserLanguage: false,
   },
   app: {
     head: {
-      title: "Epices du monde", //default fallback title
+      title: "Epices du monde - Epicerie Asiatique & Exotique", //default fallback title
       htmlAttrs: {
         lang: "fr",
       },
       link: [{ rel: "icon", type: "image/x-icon", href: "./favicon.ico" }],
-      charset: "utf-16",
-      viewport: "width=device-width, initial-scale=1, maximum-scale=1",
+      charset: "utf-8",
+      viewport: "width=device-width, initial-scale=1",
     },
     baseURL: "/",
-  },
-  image: {
-    domains: ['localhost:3000/directus/assets'],
-    alias: {
-      directus: 'http://localhost:3000/directus/assets'
-    }
   },
   icon: {
     mode: 'css',
