@@ -12,11 +12,11 @@ export default defineNuxtConfig({
     "@nuxtjs/i18n",
   ],
   css: ["~/assets/css/main.css"],
-  mdc: {
+ /*   mdc: {
     components: {
       prose: true,
     },
-  },
+  }, */
   i18n: {
     locales: [
       { code: "en", language: "en-US", name: "English", file: "en.json" },
