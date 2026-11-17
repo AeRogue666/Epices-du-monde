@@ -15,14 +15,14 @@ const handleCheckout = () => {
     cartStore.clearCart();
     toast.add({
         title: "Commande de démonstration validée",
-        description: "Merci d'avoir testé le parcours e-commerce Epices du Monde - Showcase.",
+        description: "Merci d'avoir testé le parcours e-commerce Epices du Web - Showcase.",
         icon: "i-lucide-party-popper",
         color: "success",
     });
 };
 
 useSeoMeta({
-    title: "Votre panier - Epices du Monde",
+    title: "Votre panier - Epices du Web",
     description: "Consultez et gérez les articles de votre panier."
 });
 </script>

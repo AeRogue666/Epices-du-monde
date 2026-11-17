@@ -6,6 +6,8 @@
 .cache
 dist
 
+old
+
 # Node dependencies
 node_modules
 
@@ -23,9 +25,6 @@ logs
 .env.*
 !.env.example
 *.d.ts
-
-# Directus config
-directus.ts
 
 # Others
 documentations

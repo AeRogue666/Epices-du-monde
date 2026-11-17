@@ -11,7 +11,7 @@ const newProducts = computed(() => PRODUCTS.filter((p) => p.isNew).slice(0, 4));
             <UContainer class="py-1- lg:py-24 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                 <div class="space-y-6">
                     <UBadge color="primary" variant="subtle" size="lg">
-                        Epicerie Asiatique & Exotique - DEMONSTRATION
+                        Epicerie Asiatique & Exotique - DEMONSTRATEUR
                     </UBadge>
 
                     <h1 id="hero-heading"
@@ -36,7 +36,7 @@ const newProducts = computed(() => PRODUCTS.filter((p) => p.isNew).slice(0, 4));
                 </div>
 
                 <div>
-                    <NuxtImg src="img/logo.png"
+                    <NuxtImg src="img/hero_image.png"
                         alt="Assortiment d'épices colorées, bols de curry et ingrédients asiatiques"
                         class="w-full h-full object-cover" width="800" height="600" />
                 </div>

@@ -28,7 +28,7 @@ export default defineNuxtConfig({
   },
   app: {
     head: {
-      title: "Epices du monde - Epicerie Asiatique & Exotique", //default fallback title
+      title: "Epices du Web - Epicerie Asiatique & Exotique", //default fallback title
       htmlAttrs: {
         lang: "fr",
       },
